@@ -38,6 +38,10 @@
       urlEmpty: 'Please enter an image URL', urlFetchFail: 'Failed to fetch image. The server may block CORS.',
       pasteNotAllowed: 'Clipboard image access was denied or unsupported.',
       exportJSON: 'Export JSON', exportCSV: 'Export CSV',
+      // added for status badge
+      edited: 'Edited',
+      original: 'Original',
+      noExifShort: 'No EXIF',
     },
     'zh-Hant': {
       title: 'EXIF 解析器',
@@ -57,6 +61,10 @@
       urlEmpty: '請輸入圖片網址', urlFetchFail: '圖片下載失敗，來源可能未允許跨來源存取（CORS）。',
       pasteNotAllowed: '無法讀取剪貼簿圖片，可能是權限被拒或瀏覽器不支援。',
       exportJSON: '匯出 JSON', exportCSV: '匯出 CSV',
+      // added for status badge
+      edited: '已修改',
+      original: '原始',
+      noExifShort: '無 EXIF',
     },
     'es': {
       title: 'Extractor EXIF',
@@ -76,6 +84,10 @@
       urlEmpty: 'Ingresa una URL de imagen', urlFetchFail: 'Error al descargar imagen. El servidor podría bloquear CORS.',
       pasteNotAllowed: 'No se pudo acceder al portapapeles o no es compatible.',
       exportJSON: 'Exportar JSON', exportCSV: 'Exportar CSV',
+      // added for status badge
+      edited: 'Editado',
+      original: 'Original',
+      noExifShort: 'Sin EXIF',
     }
   }
   let currentLang = 'en'
@@ -146,6 +158,24 @@
     return `1/${denom}`
   }
 
+  // 新增：判斷是否「可能曾被修改」
+  function isLikelyEdited(exif, fallback) {
+    try {
+      const dto = exif?.DateTimeOriginal || exif?.CreateDate
+      const mdt = exif?.ModifyDate
+      if (dto instanceof Date && mdt instanceof Date) {
+        const delta = mdt.getTime() - dto.getTime()
+        // 閾值：2 分鐘以上的時間差，視為曾修改（避免相機寫入的毫秒級差異）
+        if (Number.isFinite(delta) && Math.abs(delta) > 2 * 60 * 1000) return true
+      }
+      const softwareRaw = exif?.Software || exif?.ProcessingSoftware || fallback?.exif?.Software?.description || fallback?.exif?.ProcessingSoftware?.description
+      const software = typeof softwareRaw === 'string' ? softwareRaw : String(softwareRaw || '')
+      const editorKeywords = ['Adobe', 'Lightroom', 'Photoshop', 'GIMP', 'Affinity', 'Pixelmator', 'Snapseed', 'WhatsApp', 'Instagram', 'LINE', 'VSCO', 'Afterlight', 'Canva']
+      if (software && editorKeywords.some(k => software.includes(k))) return true
+      return false
+    } catch { return false }
+  }
+
   function createCardSkeleton(file) {
     const article = document.createElement('article')
     article.className = 'card'
@@ -177,8 +207,13 @@
     sizeEl.className = 'file-size'
     sizeEl.textContent = `${formatFileSize(file.size)}`
 
+    // 新增：狀態顯示容器
+    const statusEl = document.createElement('div')
+    statusEl.className = 'file-status'
+
     meta.appendChild(nameEl)
     meta.appendChild(sizeEl)
+    meta.appendChild(statusEl)
 
     header.appendChild(img)
     header.appendChild(meta)
@@ -209,7 +244,7 @@
     article.appendChild(header)
     article.appendChild(body)
 
-    return { article, header, img, meta, kv, actions, jsonPre }
+    return { article, header, img, meta, kv, actions, jsonPre, statusEl }
   }
 
   function setDropzoneBusy(isBusy) {
@@ -263,6 +298,14 @@
       else btn.textContent = t('copy')
     })
     resultsElement.querySelectorAll('.json-block > summary').forEach(s => s.textContent = t('jsonSummary'))
+    // 新增：更新檔案狀態徽章的文字
+    resultsElement.querySelectorAll('.file-status [data-status]')
+      .forEach(s => {
+        const st = s.getAttribute('data-status')
+        if (st === 'edited') s.textContent = t('edited')
+        else if (st === 'original') s.textContent = t('original')
+        else if (st === 'no-exif') s.textContent = t('noExifShort')
+      })
   }
 
   // 序列化與過濾
@@ -399,9 +442,23 @@
       }
 
       if (!exif) {
+        // 狀態徽章：無 EXIF
+        const badge = document.createElement('span')
+        badge.className = 'badge'
+        badge.setAttribute('data-status', 'no-exif')
+        badge.textContent = t('noExifShort')
+        ui.statusEl.appendChild(badge)
         addKV(ui.kv, currentLang === 'en' ? 'Status' : (currentLang === 'zh-Hant' ? '狀態' : 'Estado'), t('statusNoExif'))
         return
       }
+
+      // 狀態徽章：已修改 / 原始
+      const edited = isLikelyEdited(exif, fallback)
+      const badge = document.createElement('span')
+      badge.className = `badge ${edited ? 'danger' : 'success'}`
+      badge.setAttribute('data-status', edited ? 'edited' : 'original')
+      badge.textContent = edited ? t('edited') : t('original')
+      ui.statusEl.appendChild(badge)
 
       const make = exif.Make || exif.make || fallback?.exif?.Make?.description
       const model = exif.Model || exif.model || fallback?.exif?.Model?.description

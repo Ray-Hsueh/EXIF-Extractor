@@ -61,6 +61,10 @@ body{
 .file-name{font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
 .file-size{color:var(--muted); font-size:12px}
 
+/* 新增：檔案狀態徽章列 */
+.file-status{margin-top:4px}
+.file-status .badge{margin-right:6px}
+
 .card-body{padding:12px; display:flex; flex-direction:column; gap:10px}
 .kv{display:grid; grid-template-columns:140px 1fr; gap:6px 10px; font-size:14px}
 .kv div{min-width:0}
@@ -82,6 +86,10 @@ pre.json{max-height:240px; overflow:auto; background:#0b1326; border:1px solid v
 .json-block pre.json{margin:0;max-height:320px;overflow:auto;background:transparent;border:0;padding:10px;border-radius:0}
 
 .card:hover{border-color:#2a3554}
+
+/* 新增：徽章顏色語意 */
+.badge.success{border-color:rgba(15,185,129,.35); color:#c1f2e2; background:rgba(15,185,129,.08)}
+.badge.danger{border-color:rgba(229,72,77,.35); color:#ffd9db; background:rgba(229,72,77,.08)}
 
 @media (max-width: 720px){
   .card{flex-direction:column}
