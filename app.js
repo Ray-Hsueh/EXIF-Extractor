@@ -11,6 +11,9 @@
   const resultsElement = document.getElementById('results')
   const clearButtonElement = document.getElementById('clear-button')
   const langToggleButton = document.getElementById('lang-toggle')
+  const urlInputElement = document.getElementById('url-input')
+  const analyzeUrlButton = document.getElementById('analyze-url')
+  const pasteButton = document.getElementById('paste-button')
 
   // i18n
   const MESSAGES = {
@@ -28,6 +31,9 @@
       map: 'Open in Google Maps',
       copy: 'Copy JSON', copied: 'Copied!', copyFail: 'Copy failed', jsonSummary: 'View full JSON',
       ariaDropzone: 'Drag and drop or click to upload photos',
+      analyzeUrl: 'Analyze URL', pasteImage: 'Paste image', urlPlaceholder: 'Paste image URL (CORS required)',
+      urlEmpty: 'Please enter an image URL', urlFetchFail: 'Failed to fetch image. The server may block CORS.',
+      pasteNotAllowed: 'Clipboard image access was denied or unsupported.',
     },
     'zh-Hant': {
       title: 'EXIF 解析器',
@@ -43,6 +49,9 @@
       map: '在 Google Maps 開啟',
       copy: '複製 JSON', copied: '已複製!', copyFail: '複製失敗', jsonSummary: '查看完整 JSON',
       ariaDropzone: '拖曳或點擊上傳照片',
+      analyzeUrl: '分析網址', pasteImage: '貼上圖片', urlPlaceholder: '貼上圖片網址（需支援 CORS）',
+      urlEmpty: '請輸入圖片網址', urlFetchFail: '圖片下載失敗，來源可能未允許跨來源存取（CORS）。',
+      pasteNotAllowed: '無法讀取剪貼簿圖片，可能是權限被拒或瀏覽器不支援。',
     },
     'es': {
       title: 'Extractor EXIF',
@@ -58,6 +67,9 @@
       map: 'Abrir en Google Maps',
       copy: 'Copiar JSON', copied: '¡Copiado!', copyFail: 'Error al copiar', jsonSummary: 'Ver JSON completo',
       ariaDropzone: 'Arrastra y suelta o haz clic para subir fotos',
+      analyzeUrl: 'Analizar URL', pasteImage: 'Pegar imagen', urlPlaceholder: 'Pega la URL de la imagen (requiere CORS)',
+      urlEmpty: 'Ingresa una URL de imagen', urlFetchFail: 'Error al descargar imagen. El servidor podría bloquear CORS.',
+      pasteNotAllowed: 'No se pudo acceder al portapapeles o no es compatible.',
     }
   }
   let currentLang = 'en'
@@ -79,6 +91,11 @@
     if (dropzoneElement) dropzoneElement.setAttribute('aria-label', t('ariaDropzone'))
     // reflect current lang on <html>
     try { document.documentElement.lang = currentLang } catch {}
+
+    // URL/Paste controls text
+    if (analyzeUrlButton) analyzeUrlButton.textContent = t('analyzeUrl')
+    if (pasteButton) pasteButton.textContent = t('pasteImage')
+    if (urlInputElement) urlInputElement.placeholder = t('urlPlaceholder')
   }
 
   applyStaticTexts()
@@ -385,6 +402,95 @@
 
     setDropzoneBusy(false)
   }
+
+  function isLikelyImageResponse(resp, url) {
+    const contentType = resp.headers.get('content-type') || ''
+    const isImageType = contentType.startsWith('image/') || /\.(jpg|jpeg|png|webp|gif|bmp|tif|tiff|heic|heif|avif)(\?|#|$)/i.test(url)
+    return isImageType
+  }
+
+  async function handleUrlAnalyze(rawUrl) {
+    const url = (rawUrl || '').trim()
+    if (!url) { alert(t('urlEmpty')); return }
+    try {
+      setDropzoneBusy(true)
+      const resp = await fetch(url, { mode: 'cors' })
+      if (!resp.ok) throw new Error(`${resp.status} ${resp.statusText}`)
+      if (!isLikelyImageResponse(resp, url)) throw new Error('Not an image response')
+      const blob = await resp.blob()
+      const nameGuess = url.split('/').pop()?.split('?')[0] || 'image'
+      const extFromType = (blob.type && blob.type.split('/')[1]) || (nameGuess.includes('.') ? '' : 'jpg')
+      const file = new File([blob], nameGuess || `image.${extFromType}`, { type: blob.type || 'application/octet-stream' })
+      await handleFiles([file])
+    } catch (e) {
+      console.error(e)
+      alert(t('urlFetchFail'))
+    } finally {
+      setDropzoneBusy(false)
+    }
+  }
+
+  async function handleClipboardPaste() {
+    if (!navigator.clipboard || !navigator.clipboard.read) {
+      alert(t('pasteNotAllowed'))
+      return
+    }
+    try {
+      setDropzoneBusy(true)
+      const items = await navigator.clipboard.read()
+      const files = []
+      for (const item of items) {
+        for (const type of item.types) {
+          if (type.startsWith('image/')) {
+            const blob = await item.getType(type)
+            const file = new File([blob], `pasted.${type.split('/')[1] || 'png'}`, { type })
+            files.push(file)
+          }
+        }
+      }
+      if (files.length === 0) {
+        alert(t('pasteNotAllowed'))
+        return
+      }
+      await handleFiles(files)
+    } catch (e) {
+      console.error(e)
+      alert(t('pasteNotAllowed'))
+    } finally {
+      setDropzoneBusy(false)
+    }
+  }
+
+  // Wire URL analyze button
+  if (analyzeUrlButton) {
+    analyzeUrlButton.addEventListener('click', () => handleUrlAnalyze(urlInputElement?.value || ''))
+  }
+  if (urlInputElement) {
+    urlInputElement.addEventListener('keydown', e => {
+      if (e.key === 'Enter') handleUrlAnalyze(urlInputElement.value)
+    })
+  }
+
+  // Wire paste button and global Ctrl+V when focus is not on input elements
+  if (pasteButton) pasteButton.addEventListener('click', () => handleClipboardPaste())
+  window.addEventListener('paste', async e => {
+    try {
+      // If clipboard has files via traditional paste event
+      const dt = e.clipboardData
+      if (dt && dt.files && dt.files.length > 0) {
+        e.preventDefault()
+        await handleFiles(dt.files)
+        return
+      }
+      // Otherwise try async clipboard API for images
+      const active = document.activeElement
+      const isTyping = active && (active.tagName === 'INPUT' || active.tagName === 'TEXTAREA' || active.isContentEditable)
+      if (!isTyping) {
+        e.preventDefault()
+        await handleClipboardPaste()
+      }
+    } catch {}
+  })
 
   // Events: drag & drop
   ;['dragenter','dragover'].forEach(evt => {

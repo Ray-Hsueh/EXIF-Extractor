@@ -36,7 +36,7 @@ body{
 .browse-button:hover{background:var(--accent-2)}
 .dz-hint{margin:10px 0 0; color:var(--muted)}
 
-.toolbar{display:flex; gap:12px; margin-top:14px}
+.toolbar{display:flex; gap:12px; margin-top:14px; align-items:center; flex-wrap:wrap}
 .btn{
   appearance:none; border:1px solid var(--border); background:#0e1629; color:var(--text);
   padding:8px 12px; border-radius:10px; cursor:pointer; transition:.15s ease all;
@@ -89,3 +89,10 @@ pre.json{max-height:240px; overflow:auto; background:#0b1326; border:1px solid v
   .file-thumb{width:96px;height:96px}
   .kv{grid-template-columns:100px 1fr}
 } 
+
+.text-input{ 
+  width: min(460px, 100%);
+  padding:8px 12px; border-radius:10px; border:1px solid var(--border);
+  background:#0e1629; color:var(--text);
+}
+.text-input:focus{outline:none; border-color:var(--accent); box-shadow:0 0 0 4px rgba(79,140,255,.15)} 
