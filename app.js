@@ -14,6 +14,9 @@
   const urlInputElement = document.getElementById('url-input')
   const analyzeUrlButton = document.getElementById('analyze-url')
   const pasteButton = document.getElementById('paste-button')
+  const exportJsonButton = document.getElementById('export-json')
+  const exportCsvButton = document.getElementById('export-csv')
+  const browseLabelElement = document.querySelector('.browse-button')
 
   // i18n
   const MESSAGES = {
@@ -31,9 +34,10 @@
       map: 'Open in Google Maps',
       copy: 'Copy JSON', copied: 'Copied!', copyFail: 'Copy failed', jsonSummary: 'View full JSON',
       ariaDropzone: 'Drag and drop or click to upload photos',
-      analyzeUrl: 'Analyze URL', pasteImage: 'Paste image', urlPlaceholder: 'Paste image URL (CORS required)',
+      analyzeUrl: 'Analyze URL', pasteImage: 'Paste image', urlPlaceholder: 'Paste image URL',
       urlEmpty: 'Please enter an image URL', urlFetchFail: 'Failed to fetch image. The server may block CORS.',
       pasteNotAllowed: 'Clipboard image access was denied or unsupported.',
+      exportJSON: 'Export JSON', exportCSV: 'Export CSV',
     },
     'zh-Hant': {
       title: 'EXIF 解析器',
@@ -49,9 +53,10 @@
       map: '在 Google Maps 開啟',
       copy: '複製 JSON', copied: '已複製!', copyFail: '複製失敗', jsonSummary: '查看完整 JSON',
       ariaDropzone: '拖曳或點擊上傳照片',
-      analyzeUrl: '分析網址', pasteImage: '貼上圖片', urlPlaceholder: '貼上圖片網址（需支援 CORS）',
+      analyzeUrl: '分析網址', pasteImage: '貼上圖片', urlPlaceholder: '貼上圖片網址',
       urlEmpty: '請輸入圖片網址', urlFetchFail: '圖片下載失敗，來源可能未允許跨來源存取（CORS）。',
       pasteNotAllowed: '無法讀取剪貼簿圖片，可能是權限被拒或瀏覽器不支援。',
+      exportJSON: '匯出 JSON', exportCSV: '匯出 CSV',
     },
     'es': {
       title: 'Extractor EXIF',
@@ -67,12 +72,14 @@
       map: 'Abrir en Google Maps',
       copy: 'Copiar JSON', copied: '¡Copiado!', copyFail: 'Error al copiar', jsonSummary: 'Ver JSON completo',
       ariaDropzone: 'Arrastra y suelta o haz clic para subir fotos',
-      analyzeUrl: 'Analizar URL', pasteImage: 'Pegar imagen', urlPlaceholder: 'Pega la URL de la imagen (requiere CORS)',
+      analyzeUrl: 'Analizar URL', pasteImage: 'Pegar imagen', urlPlaceholder: 'Pega la URL de la imagen',
       urlEmpty: 'Ingresa una URL de imagen', urlFetchFail: 'Error al descargar imagen. El servidor podría bloquear CORS.',
       pasteNotAllowed: 'No se pudo acceder al portapapeles o no es compatible.',
+      exportJSON: 'Exportar JSON', exportCSV: 'Exportar CSV',
     }
   }
   let currentLang = 'en'
+  const parsedResults = []
 
   function t(key) { return MESSAGES[currentLang][key] || key }
 
@@ -92,10 +99,12 @@
     // reflect current lang on <html>
     try { document.documentElement.lang = currentLang } catch {}
 
-    // URL/Paste controls text
+    // URL/Paste/Export controls text
     if (analyzeUrlButton) analyzeUrlButton.textContent = t('analyzeUrl')
     if (pasteButton) pasteButton.textContent = t('pasteImage')
     if (urlInputElement) urlInputElement.placeholder = t('urlPlaceholder')
+    if (exportJsonButton) exportJsonButton.textContent = t('exportJSON')
+    if (exportCsvButton) exportCsvButton.textContent = t('exportCSV')
   }
 
   applyStaticTexts()
@@ -298,14 +307,69 @@
     return undefined
   }
 
+  // 匯出輔助
+  function nowTimestamp() {
+    const d = new Date()
+    const pad = n => String(n).padStart(2, '0')
+    return `${d.getFullYear()}${pad(d.getMonth()+1)}${pad(d.getDate())}-${pad(d.getHours())}${pad(d.getMinutes())}${pad(d.getSeconds())}`
+  }
+  function downloadBlob(blob, filename) {
+    const a = document.createElement('a')
+    const url = URL.createObjectURL(blob)
+    a.href = url
+    a.download = filename
+    document.body.appendChild(a)
+    a.click()
+    a.remove()
+    setTimeout(() => URL.revokeObjectURL(url), 1000)
+  }
+  function toCsvCell(val) {
+    if (val == null) return '""'
+    let s = ''
+    if (val instanceof Date) s = val.toISOString()
+    else s = String(val)
+    s = s.replace(/"/g, '""')
+    return `"${s}` + `"`
+  }
+  function toCsvRow(arr) { return arr.map(toCsvCell).join(',') }
+  function updateExportButtonsDisabledState() {
+    const disabled = parsedResults.length === 0
+    if (exportJsonButton) exportJsonButton.disabled = disabled
+    if (exportCsvButton) exportCsvButton.disabled = disabled
+  }
+  function exportAsJSON() {
+    if (parsedResults.length === 0) return
+    const blob = new Blob([JSON.stringify(parsedResults, null, 2)], { type: 'application/json' })
+    downloadBlob(blob, `exif-export-${nowTimestamp()}.json`)
+  }
+  function exportAsCSV() {
+    if (parsedResults.length === 0) return
+    const headers = ['FileName','FileSize','Make','Model','Lens','ISO','FNumber','ExposureTime','FocalLength','DateTimeOriginal','GPSLatitude','GPSLongitude']
+    const rows = parsedResults.map(r => {
+      const s = r.summary || {}
+      return [
+        s.fileName ?? r.fileName ?? '',
+        s.fileSize ?? r.fileSize ?? '',
+        s.make ?? '', s.model ?? '', s.lens ?? '',
+        s.iso ?? '', s.fNumber ?? '', s.exposureTime ?? '',
+        s.focalLength ?? '', s.dateTime ?? '',
+        s.gpsLatitude ?? '', s.gpsLongitude ?? '',
+      ]
+    })
+    const csv = [headers, ...rows].map(toCsvRow).join('\r\n')
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' })
+    downloadBlob(blob, `exif-export-${nowTimestamp()}.csv`)
+  }
+
   async function parseOneFile(file) {
     const ui = createCardSkeleton(file)
     resultsElement.prepend(ui.article)
 
     try {
-      const [exifrResult, rotation] = await Promise.all([
+      const [exifrResult, rotation, exifrGps] = await Promise.all([
         exifrLib.parse(file, true).catch(() => undefined),
         exifrLib.rotation(file).catch(() => undefined),
+        exifrLib.gps ? exifrLib.gps(file).catch(() => undefined) : Promise.resolve(undefined),
       ])
 
       if (rotation && rotation.css) {
@@ -315,9 +379,14 @@
       // Try ExifReader fallback if needed
       let exif = exifrResult
       let fallback = undefined
-      let gps = {
-        latitude: exifrResult?.latitude ?? exifrResult?.GPSLatitude,
-        longitude: exifrResult?.longitude ?? exifrResult?.GPSLongitude,
+      let gps = {}
+      if (exifrGps && exifrGps.latitude != null && exifrGps.longitude != null) {
+        gps = { latitude: exifrGps.latitude, longitude: exifrGps.longitude }
+      } else {
+        gps = {
+          latitude: exifrResult?.latitude ?? exifrResult?.GPSLatitude,
+          longitude: exifrResult?.longitude ?? exifrResult?.GPSLongitude,
+        }
       }
 
       if ((!exif || (gps.latitude == null || gps.longitude == null)) && ExifReader) {
@@ -347,19 +416,21 @@
       addKV(ui.kv, t('lens'), lens || '')
       addKV(ui.kv, t('time'), formatDate(dt))
       addKV(ui.kv, t('iso'), iso ? String(iso) : '')
-      addKV(ui.kv, t('aperture'), fnum ? `f/${Number(fnum).toFixed(1)}` : '')
-      addKV(ui.kv, t('shutter'), formatExposureTime(typeof exposure === 'number' ? exposure : Number(exposure)))
+      const exposureValue = (typeof exposure === 'number' ? exposure : Number(exposure))
+      addKV(ui.kv, t('shutter'), formatExposureTime(exposureValue))
       addKV(ui.kv, t('focal'), focal ? `${String(focal)} mm` : '')
 
-      if (typeof gps.latitude === 'number' && typeof gps.longitude === 'number') {
+      const latNum = Number(gps.latitude)
+      const lonNum = Number(gps.longitude)
+      if (Number.isFinite(latNum) && Number.isFinite(lonNum)) {
         const mapLink = document.createElement('a')
         mapLink.className = 'btn'
-        mapLink.href = `https://www.google.com/maps/search/?api=1&query=${gps.latitude},${gps.longitude}`
+        mapLink.href = `https://www.google.com/maps/search/?api=1&query=${latNum},${lonNum}`
         mapLink.target = '_blank'
         mapLink.rel = 'noopener'
         mapLink.textContent = t('map')
         ui.actions.appendChild(mapLink)
-        addKV(ui.kv, t('gps'), `${gps.latitude.toFixed(6)}, ${gps.longitude.toFixed(6)}`)
+        addKV(ui.kv, t('gps'), `${latNum.toFixed(6)}, ${lonNum.toFixed(6)}`)
       } else {
         addKV(ui.kv, t('gps'), '—')
       }
@@ -369,8 +440,8 @@
       copyBtn.textContent = t('copy')
       copyBtn.addEventListener('click', async () => {
         try {
-          const payload = { exifr: toSerializableTrimmed(exifrResult), exifreader: toSerializableTrimmed(fallback) }
-          await navigator.clipboard.writeText(JSON.stringify(payload, null, 2))
+          const payload2 = { exifr: toSerializableTrimmed(exifrResult), exifreader: toSerializableTrimmed(fallback) }
+          await navigator.clipboard.writeText(JSON.stringify(payload2, null, 2))
           copyBtn.textContent = t('copied')
           setTimeout(() => (copyBtn.textContent = t('copy')), 1200)
         } catch {
@@ -382,6 +453,24 @@
 
       const payload = { exifr: toSerializableTrimmed(exifrResult), exifreader: toSerializableTrimmed(fallback) }
       ui.jsonPre.textContent = JSON.stringify(payload, null, 2)
+
+      // 收集彙整資料供匯出
+      const summary = {
+        fileName: file.name,
+        fileSize: file.size,
+        make: make || '',
+        model: model || '',
+        lens: lens || '',
+        iso: iso ?? '',
+        fNumber: (fnum != null ? Number(fnum) : ''),
+        exposureTime: formatExposureTime(exposureValue),
+        focalLength: (focal != null ? String(focal) : ''),
+        dateTime: (dt instanceof Date ? dt.toISOString() : (dt ?? '')),
+        gpsLatitude: (Number.isFinite(Number(gps.latitude)) ? Number(gps.latitude) : ''),
+        gpsLongitude: (Number.isFinite(Number(gps.longitude)) ? Number(gps.longitude) : ''),
+      }
+      parsedResults.push({ fileName: file.name, fileSize: file.size, summary, exifr: payload.exifr, exifreader: payload.exifreader })
+      updateExportButtonsDisabledState()
 
     } catch (err) {
       addKV(ui.kv, t('error'), err?.message || 'Parse failed')
@@ -503,10 +592,16 @@
     const dt = e.dataTransfer
     if (dt?.files?.length) handleFiles(dt.files)
   })
-  dropzoneElement.addEventListener('click', () => fileInputElement.click())
+  dropzoneElement.addEventListener('click', e => {
+    if (e.target && e.target.closest && e.target.closest('.browse-button')) return
+    fileInputElement.click()
+  })
   dropzoneElement.addEventListener('keydown', e => {
     if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); fileInputElement.click() }
   })
+  if (browseLabelElement) {
+    browseLabelElement.addEventListener('click', e => { e.stopPropagation() })
+  }
 
   // File input
   fileInputElement.addEventListener('change', e => {
@@ -515,9 +610,16 @@
     // keep selection so user can add more without clearing
   })
 
+  // Export buttons
+  if (exportJsonButton) exportJsonButton.addEventListener('click', exportAsJSON)
+  if (exportCsvButton) exportCsvButton.addEventListener('click', exportAsCSV)
+  updateExportButtonsDisabledState()
+
   // Clear results
   clearButtonElement.addEventListener('click', () => {
     resultsElement.innerHTML = ''
     clearButtonElement.disabled = true
+    parsedResults.length = 0
+    updateExportButtonsDisabledState()
   })
 })() 
