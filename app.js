@@ -27,6 +27,7 @@
       camera: 'Camera', lens: 'Lens', time: 'Time', iso: 'ISO', aperture: 'Aperture', shutter: 'Shutter', focal: 'Focal length', gps: 'GPS', error: 'Error',
       map: 'Open in Google Maps',
       copy: 'Copy JSON', copied: 'Copied!', copyFail: 'Copy failed', jsonSummary: 'View full JSON',
+      ariaDropzone: 'Drag and drop or click to upload photos',
     },
     'zh-Hant': {
       title: 'EXIF 解析器',
@@ -41,6 +42,22 @@
       camera: '相機', lens: '鏡頭', time: '時間', iso: 'ISO', aperture: '光圈', shutter: '快門', focal: '焦距', gps: 'GPS', error: '錯誤',
       map: '在 Google Maps 開啟',
       copy: '複製 JSON', copied: '已複製!', copyFail: '複製失敗', jsonSummary: '查看完整 JSON',
+      ariaDropzone: '拖曳或點擊上傳照片',
+    },
+    'es': {
+      title: 'Extractor EXIF',
+      subtitle: 'Todo el análisis se realiza localmente. No se suben fotos.',
+      dropTitle: 'Arrastra fotos aquí',
+      or: 'o',
+      chooseFiles: 'Elegir archivos',
+      hint: 'Compatible con JPG, PNG, HEIC, AVIF, TIFF… Se recomienda archivo individual ≤ 50 MB.',
+      clear: 'Limpiar resultados',
+      exifrLoadFail: 'No se pudo cargar exifr. Verifica tu red e inténtalo de nuevo.',
+      statusNoExif: 'No se encontraron datos EXIF',
+      camera: 'Cámara', lens: 'Objetivo', time: 'Hora', iso: 'ISO', aperture: 'Apertura', shutter: 'Obturación', focal: 'Longitud focal', gps: 'GPS', error: 'Error',
+      map: 'Abrir en Google Maps',
+      copy: 'Copiar JSON', copied: '¡Copiado!', copyFail: 'Error al copiar', jsonSummary: 'Ver JSON completo',
+      ariaDropzone: 'Arrastra y suelta o haz clic para subir fotos',
     }
   }
   let currentLang = 'en'
@@ -56,15 +73,19 @@
       if (el) el.textContent = t(k)
     }
     if (clearButtonElement) clearButtonElement.textContent = t('clear')
-    if (langToggleButton) langToggleButton.textContent = currentLang === 'en' ? '中文' : 'EN'
-    if (dropzoneElement) dropzoneElement.setAttribute('aria-label', currentLang === 'en' ? 'Drag and drop or click to upload photos' : '拖曳或點擊上傳照片')
+    // button shows the NEXT language to switch to
+    const nextLang = currentLang === 'en' ? 'zh-Hant' : (currentLang === 'zh-Hant' ? 'es' : 'en')
+    if (langToggleButton) langToggleButton.textContent = (nextLang === 'zh-Hant' ? '中文' : (nextLang === 'es' ? 'ES' : 'EN'))
+    if (dropzoneElement) dropzoneElement.setAttribute('aria-label', t('ariaDropzone'))
+    // reflect current lang on <html>
+    try { document.documentElement.lang = currentLang } catch {}
   }
 
   applyStaticTexts()
 
   if (langToggleButton) {
     langToggleButton.addEventListener('click', () => {
-      currentLang = currentLang === 'en' ? 'zh-Hant' : 'en'
+      currentLang = currentLang === 'en' ? 'zh-Hant' : (currentLang === 'zh-Hant' ? 'es' : 'en')
       applyStaticTexts()
       // 重新渲染目前結果卡片的欄位名稱
       rerenderAllCardsLabels()
@@ -183,16 +204,16 @@
   // 重新渲染既有卡片的欄位名稱（值不變）
   function rerenderAllCardsLabels() {
     const keyMap = new Map([
-      ['Camera', 'camera'], ['相機', 'camera'],
-      ['Lens', 'lens'], ['鏡頭', 'lens'],
-      ['Time', 'time'], ['時間', 'time'],
+      ['Camera', 'camera'], ['相機', 'camera'], ['Cámara', 'camera'],
+      ['Lens', 'lens'], ['鏡頭', 'lens'], ['Objetivo', 'lens'],
+      ['Time', 'time'], ['時間', 'time'], ['Hora', 'time'],
       ['ISO', 'iso'],
-      ['Aperture', 'aperture'], ['光圈', 'aperture'],
-      ['Shutter', 'shutter'], ['快門', 'shutter'],
-      ['Focal length', 'focal'], ['焦距', 'focal'],
+      ['Aperture', 'aperture'], ['光圈', 'aperture'], ['Apertura', 'aperture'],
+      ['Shutter', 'shutter'], ['快門', 'shutter'], ['Obturación', 'shutter'],
+      ['Focal length', 'focal'], ['焦距', 'focal'], ['Longitud focal', 'focal'],
       ['GPS', 'gps'],
-      ['Error', 'error'], ['錯誤', 'error'],
-      ['Status', 'status'], ['狀態', 'status'],
+      ['Error', 'error'], ['錯誤', 'error'], ['Error', 'error'],
+      ['Status', 'status'], ['狀態', 'status'], ['Estado', 'status'],
     ])
     resultsElement.querySelectorAll('.card .kv .key').forEach(el => {
       const key = keyMap.get(el.textContent) || el.textContent
@@ -206,7 +227,7 @@
         case 'focal': el.textContent = t('focal'); break
         case 'gps': el.textContent = t('gps'); break
         case 'error': el.textContent = t('error'); break
-        case 'status': el.textContent = currentLang === 'en' ? 'Status' : '狀態'; break
+        case 'status': el.textContent = (currentLang === 'en' ? 'Status' : (currentLang === 'zh-Hant' ? '狀態' : 'Estado')); break
         default: break
       }
     })
@@ -292,7 +313,7 @@
       }
 
       if (!exif) {
-        addKV(ui.kv, currentLang === 'en' ? 'Status' : '狀態', t('statusNoExif'))
+        addKV(ui.kv, currentLang === 'en' ? 'Status' : (currentLang === 'zh-Hant' ? '狀態' : 'Estado'), t('statusNoExif'))
         return
       }
 

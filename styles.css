@@ -46,6 +46,10 @@ body{
 .btn.primary{background:var(--accent); border-color:var(--accent); color:#fff}
 .btn.danger{background:#2a0c11; border-color:#461217; color:#ffd7db}
 
+/* GitHub repo button */
+.btn.github-btn{display:inline-flex;align-items:center;gap:8px;text-decoration:none}
+.btn.github-btn svg{width:18px;height:18px;fill:currentColor;display:block}
+
 .results{display:grid; grid-template-columns:1fr; gap:16px; margin:22px 0 40px}
 .card{
   background:var(--card); border:1px solid var(--border); border-radius:14px; overflow:hidden;
