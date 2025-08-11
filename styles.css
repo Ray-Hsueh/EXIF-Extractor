@@ -1,0 +1,87 @@
+:root{
+  --bg: #0b1020;
+  --card: #121a2c;
+  --accent: #4f8cff;
+  --accent-2:#1f6dff;
+  --text: #e7eefc;
+  --muted:#9aa8c5;
+  --border:#1d2740;
+  --success:#0fb981;
+  --danger:#e5484d;
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0; background:var(--bg); color:var(--text);
+  font:16px/1.6 system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,Noto Sans,Helvetica,Arial,"Apple Color Emoji","Segoe UI Emoji";
+}
+.container{max-width:1100px;margin:0 auto;padding:24px}
+.site-header{border-bottom:1px solid var(--border);background:linear-gradient(180deg, rgba(255,255,255,0.04), transparent)}
+.title{margin:0;font-size:28px}
+.subtitle{margin:4px 0 0;color:var(--muted)}
+.site-footer{opacity:.8;color:var(--muted);padding-top:0}
+
+.uploader-section{margin-top:20px}
+.dropzone{
+  border:2px dashed var(--border); border-radius:14px; padding:28px; text-align:center;
+  background:linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01));
+  transition: all .18s ease; outline:none;
+}
+.dropzone:hover, .dropzone:focus{border-color:var(--accent); box-shadow:0 0 0 4px rgba(79,140,255,.15)}
+.dropzone.is-dragover{border-color:var(--accent); background:rgba(79,140,255,.06)}
+.dropzone.is-busy{opacity:.7; pointer-events:none}
+.dz-title{font-size:18px; font-weight:600}
+.dz-separator{margin:10px 0; color:var(--muted)}
+.browse-button{display:inline-block; background:var(--accent); color:#fff; padding:10px 14px; border-radius:10px; cursor:pointer}
+.browse-button:hover{background:var(--accent-2)}
+.dz-hint{margin:10px 0 0; color:var(--muted)}
+
+.toolbar{display:flex; gap:12px; margin-top:14px}
+.btn{
+  appearance:none; border:1px solid var(--border); background:#0e1629; color:var(--text);
+  padding:8px 12px; border-radius:10px; cursor:pointer; transition:.15s ease all;
+}
+.btn:hover{border-color:var(--accent)}
+.btn:disabled{opacity:.5; cursor:not-allowed}
+.btn.primary{background:var(--accent); border-color:var(--accent); color:#fff}
+.btn.danger{background:#2a0c11; border-color:#461217; color:#ffd7db}
+
+.results{display:grid; grid-template-columns:1fr; gap:16px; margin:22px 0 40px}
+.card{
+  background:var(--card); border:1px solid var(--border); border-radius:14px; overflow:hidden;
+  display:flex; flex-direction:row; min-height:220px
+}
+.card-header{display:flex; flex-direction:column; align-items:flex-start; gap:12px; padding:16px; border-right:1px solid var(--border); min-width:240px}
+.file-thumb{width:160px;height:160px;border-radius:10px;object-fit:cover;background:#0c1427;border:1px solid var(--border)}
+.file-meta{display:flex; flex-direction:column; gap:2px; min-width:0}
+.file-name{font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+.file-size{color:var(--muted); font-size:12px}
+
+.card-body{padding:12px; display:flex; flex-direction:column; gap:10px}
+.kv{display:grid; grid-template-columns:140px 1fr; gap:6px 10px; font-size:14px}
+.kv div{min-width:0}
+.kv .key{color:var(--muted)}
+.kv .val{white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+
+.actions{display:flex; gap:8px; margin-top:6px}
+pre.json{max-height:240px; overflow:auto; background:#0b1326; border:1px solid var(--border); padding:10px; border-radius:10px}
+.badge{display:inline-block; padding:2px 8px; border-radius:999px; font-size:12px; border:1px solid var(--border); color:var(--muted)}
+.link{color:var(--accent)}
+
+/* RAW/NEF 等無法預覽時的字母縮圖 */
+.file-thumb-fallback{display:flex;align-items:center;justify-content:center;font-weight:700;color:#a9b8e8;background:linear-gradient(180deg,#0c1427,#0b1326);text-transform:uppercase}
+/* 可收合的 JSON 區塊 */
+.json-block{margin-top:8px;background:#0b1326;border:1px solid var(--border);border-radius:10px}
+.json-block summary{cursor:pointer;padding:8px 10px;color:var(--muted);user-select:none}
+.json-block summary::-webkit-details-marker{display:none}
+.json-block[open] summary{color:var(--text);border-bottom:1px solid var(--border)}
+.json-block pre.json{margin:0;max-height:320px;overflow:auto;background:transparent;border:0;padding:10px;border-radius:0}
+
+.card:hover{border-color:#2a3554}
+
+@media (max-width: 720px){
+  .card{flex-direction:column}
+  .card-header{flex-direction:row; align-items:center; border-right:none; border-bottom:1px solid var(--border); min-width:auto; padding:12px; gap:10px}
+  .file-thumb{width:96px;height:96px}
+  .kv{grid-template-columns:100px 1fr}
+} 

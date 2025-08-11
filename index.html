@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>EXIF Extractor</title>
+  <meta name="description" content="Offline EXIF viewer: parse EXIF & GPS in the browser without uploading your photos.">
+  <link rel="stylesheet" href="./styles.css">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%93%B7%3C/text%3E%3C/svg%3E">
+  <script src="https://cdn.jsdelivr.net/npm/exifr/dist/full.umd.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/exifreader/dist/exif-reader.js" defer></script>
+  <script src="./app.js" defer></script>
+</head>
+<body>
+  <header class="site-header">
+    <div class="container">
+      <h1 class="title" id="title">EXIF Viewer</h1>
+      <p class="subtitle" id="subtitle">All parsing happens locally. No photos are uploaded.</p>
+      <div class="toolbar" style="margin-top:10px">
+        <button id="lang-toggle" class="btn">中文</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="uploader-section">
+      <div id="dropzone" class="dropzone" tabindex="0" role="button" aria-label="Drag and drop or click to upload photos">
+        <div class="dz-instructions">
+          <div class="dz-title" id="dz-title">Drag photos here</div>
+          <div class="dz-separator" id="dz-or">or</div>
+          <label class="browse-button">
+            <input id="file-input" type="file" accept="image/*,.heic,.heif,.avif,.tif,.tiff,.jpg,.jpeg,.png" multiple hidden>
+            <span id="browse-label">Choose files</span>
+          </label>
+          <p class="dz-hint" id="dz-hint">Supports JPG, PNG, HEIC, AVIF, TIFF… Recommended single file ≤ 50MB.</p>
+        </div>
+      </div>
+      <div class="toolbar">
+        <button id="clear-button" class="btn" disabled>Clear results</button>
+      </div>
+    </section>
+
+    <section id="results" class="results" aria-live="polite"></section>
+  </main>
+
+  <footer class="site-footer container">
+    <p>Powered by <a href="https://github.com/MikeKovarik/exifr" target="_blank" rel="noopener">exifr</a>. Preview may differ due to browser auto-rotation.</p>
+  </footer>
+
+  <noscript>
+    JavaScript is required to use this tool.
+  </noscript>
+</body>
+</html> 
