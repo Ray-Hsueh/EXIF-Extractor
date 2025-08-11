@@ -17,6 +17,7 @@
   const exportJsonButton = document.getElementById('export-json')
   const exportCsvButton = document.getElementById('export-csv')
   const browseLabelElement = document.querySelector('.browse-button')
+  const langSegmentButtons = Array.from(document.querySelectorAll('.segmented .segment'))
 
   // i18n
   const MESSAGES = {
@@ -127,8 +128,35 @@
       applyStaticTexts()
       // 重新渲染目前結果卡片的欄位名稱
       rerenderAllCardsLabels()
+      updateLangSegmentsActive()
     })
   }
+
+  function updateLangSegmentsActive() {
+    if (!langSegmentButtons || langSegmentButtons.length === 0) return
+    langSegmentButtons.forEach(btn => {
+      const isActive = btn.getAttribute('data-lang') === currentLang
+      btn.classList.toggle('is-active', isActive)
+      btn.setAttribute('aria-pressed', isActive ? 'true' : 'false')
+    })
+  }
+
+  function setupLangSegments() {
+    if (!langSegmentButtons || langSegmentButtons.length === 0) return
+    langSegmentButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const lang = btn.getAttribute('data-lang') || 'en'
+        if (lang === currentLang) return
+        currentLang = lang
+        applyStaticTexts()
+        rerenderAllCardsLabels()
+        updateLangSegmentsActive()
+      })
+    })
+    updateLangSegmentsActive()
+  }
+
+  setupLangSegments()
 
   function formatFileSize(bytes) {
     if (!Number.isFinite(bytes)) return ''
