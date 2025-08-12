@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
+  <defs>
+    <style>
+      .bg{fill:#4f8cff}
+      .cam{fill:#ffffff}
+      .lens{fill:#0b1020}
+      .blade{stroke:#79a8ff;stroke-width:2;stroke-linecap:round}
+    </style>
+  </defs>
+  <rect class="bg" x="2" y="2" width="60" height="60" rx="12"/>
+  <!-- camera top bar -->
+  <rect class="cam" x="20" y="14" width="24" height="8" rx="2"/>
+  <!-- camera body -->
+  <rect class="cam" x="10" y="18" width="44" height="30" rx="6"/>
+  <!-- lens -->
+  <circle class="lens" cx="32" cy="33" r="11"/>
+  <!-- aperture blades -->
+  <path class="blade" d="M32 22 L38 28"/>
+  <path class="blade" d="M38 28 L36 36"/>
+  <path class="blade" d="M36 36 L28 38"/>
+  <path class="blade" d="M28 38 L26 30"/>
+  <path class="blade" d="M26 30 L32 22"/>
+</svg> 
