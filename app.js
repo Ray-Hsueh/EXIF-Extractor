@@ -51,6 +51,11 @@
       hashMD5: 'MD5', hashSHA256: 'SHA-256',
       digitalSignature: 'Digital signature', signaturePresent: 'Present', signatureAbsent: 'Not detected',
       exportPDF: 'Export PDF',
+      expandAll: 'Expand all',
+      collapseAll: 'Collapse all',
+      removeCard: 'Remove card',
+      copyCoords: 'Copy coords',
+      copyMain: 'Copy summary',
     },
     'zh-Hant': {
       title: 'EXIF 解析器',
@@ -81,6 +86,11 @@
       hashMD5: 'MD5', hashSHA256: 'SHA-256',
       digitalSignature: '數位簽章', signaturePresent: '已偵測', signatureAbsent: '未偵測',
       exportPDF: '匯出 PDF',
+      expandAll: '全部展開',
+      collapseAll: '全部收起',
+      removeCard: '刪除卡片',
+      copyCoords: '複製座標',
+      copyMain: '複製主要欄位',
     },
     'es': {
       title: 'Extractor EXIF',
@@ -111,6 +121,11 @@
       hashMD5: 'MD5', hashSHA256: 'SHA-256',
       digitalSignature: 'Firma digital', signaturePresent: 'Presente', signatureAbsent: 'No detectado',
       exportPDF: 'Exportar PDF',
+      expandAll: 'Expandir todo',
+      collapseAll: 'Contraer todo',
+      removeCard: 'Eliminar tarjeta',
+      copyCoords: 'Copiar coordenadas',
+      copyMain: 'Copiar resumen',
     },
     'fr': {
       title: 'Extracteur EXIF',
@@ -139,6 +154,11 @@
       hashMD5: 'MD5', hashSHA256: 'SHA-256',
       digitalSignature: 'Signature numérique', signaturePresent: 'Présente', signatureAbsent: 'Non détectée',
       exportPDF: 'Exporter en PDF',
+      expandAll: 'Tout développer',
+      collapseAll: 'Tout réduire',
+      removeCard: 'Supprimer la carte',
+      copyCoords: 'Copier les coordonnées',
+      copyMain: 'Copier le résumé',
     },
     'ar': {
       title: 'مستخرج EXIF',
@@ -167,12 +187,37 @@
       hashMD5: 'MD5', hashSHA256: 'SHA-256',
       digitalSignature: 'التوقيع الرقمي', signaturePresent: 'موجود', signatureAbsent: 'غير موجود',
       exportPDF: 'تصدير PDF',
+      expandAll: 'توسيع الكل',
+      collapseAll: 'طي الكل',
+      removeCard: 'إزالة البطاقة',
+      copyCoords: 'نسخ الإحداثيات',
+      copyMain: 'نسخ الملخص',
     }
   }
-  let currentLang = 'en'
+  let currentLang = detectPreferredLang()
   const parsedResults = []
 
   function t(key) { return MESSAGES[currentLang][key] || key }
+
+  function detectPreferredLang() {
+    try {
+      const saved = localStorage.getItem('exif_lang')
+      if (saved && MESSAGES[saved]) return saved
+    } catch {}
+    const langs = (navigator.languages && navigator.languages.length ? navigator.languages : [navigator.language || 'en']).map(s => String(s || '').toLowerCase())
+    for (const s of langs) {
+      if (s.startsWith('zh') && (s.includes('hant') || s.endsWith('-tw') || s.endsWith('-hk') || s.endsWith('-mo'))) return 'zh-Hant'
+      if (s.startsWith('es')) return 'es'
+      if (s.startsWith('fr')) return 'fr'
+      if (s.startsWith('ar')) return 'ar'
+      if (s.startsWith('en')) return 'en'
+    }
+    return 'en'
+  }
+
+  function saveLangPreference(lang) {
+    try { localStorage.setItem('exif_lang', lang) } catch {}
+  }
 
   function applyStaticTexts() {
     const ids = {
@@ -210,6 +255,15 @@
     // tooltip content for supported formats
     const dzTooltip = document.getElementById('dz-tooltip')
     if (dzTooltip) dzTooltip.textContent = t('hint')
+
+    // Expand/Collapse all buttons
+    const expAll = document.getElementById('expand-all')
+    if (expAll) { expAll.textContent = t('expandAll'); expAll.setAttribute('aria-label', t('expandAll')) }
+    const colAll = document.getElementById('collapse-all')
+    if (colAll) { colAll.textContent = t('collapseAll'); colAll.setAttribute('aria-label', t('collapseAll')) }
+
+    // Refresh stats text to current language
+    updateStats()
   }
 
   applyStaticTexts()
@@ -223,6 +277,8 @@
       // 重新渲染目前結果卡片的欄位名稱
       rerenderAllCardsLabels()
       updateLangSegmentsActive()
+      saveLangPreference(currentLang)
+      updateStats()
     })
   }
 
@@ -245,6 +301,8 @@
         applyStaticTexts()
         rerenderAllCardsLabels()
         updateLangSegmentsActive()
+        saveLangPreference(currentLang)
+        updateStats()
       })
     })
     updateLangSegmentsActive()
@@ -416,6 +474,7 @@
     const dzBusy = document.getElementById('dz-busy')
     const dzBusyText = document.getElementById('dz-busy-text')
     if (dzBusy) dzBusy.setAttribute('aria-hidden', busy ? 'false' : 'true')
+    if (dropzoneElement) dropzoneElement.setAttribute('aria-busy', busy ? 'true' : 'false')
     if (dzBusyText) dzBusyText.textContent = (
       currentLang === 'en' ? 'Processing…' :
       currentLang === 'zh-Hant' ? '處理中…' :
@@ -481,10 +540,14 @@
         default: break
       }
     })
-    // 更新 map 與 copy 按鈕文字、JSON summary
+    // 更新動作按鈕文字（依據 data-action）與 JSON 摺疊標題
     resultsElement.querySelectorAll('.card .actions .btn').forEach(btn => {
-      if (btn.href && btn.href.includes('google.com/maps')) btn.textContent = t('map')
-      else btn.textContent = t('copy')
+      const act = btn.dataset.action || ''
+      if (act === 'map') btn.textContent = t('map')
+      else if (act === 'copy-json') btn.textContent = t('copy')
+      else if (act === 'copy-main') btn.textContent = t('copyMain')
+      else if (act === 'copy-coords') btn.textContent = t('copyCoords')
+      else if (act === 'remove-card') btn.textContent = t('removeCard')
     })
     resultsElement.querySelectorAll('.json-block > summary').forEach(s => s.textContent = t('jsonSummary'))
     // 新增：更新檔案狀態徽章的文字
@@ -571,6 +634,40 @@
     if (exportCsvButton) exportCsvButton.disabled = noParsed
     if (exportPdfButton) exportPdfButton.disabled = noCards
   }
+
+  // Ensure the busy overlay has a chance to render before heavy work starts
+  function waitForNextFrame(times = 1) {
+    return new Promise(resolve => {
+      const tick = (n) => {
+        if (n <= 0) return resolve()
+        requestAnimationFrame(() => tick(n - 1))
+      }
+      tick(times)
+    })
+  }
+
+  function composeStatsText(n, gps, edited) {
+    try {
+      if (currentLang === 'zh-Hant') return `已解析 ${n} 檔｜有 GPS ${gps} 檔｜判定已修改 ${edited} 檔`
+      if (currentLang === 'es') return `Analizados ${n} | Con GPS ${gps} | Editados ${edited}`
+      if (currentLang === 'fr') return `Analysés ${n} | GPS ${gps} | Modifiés ${edited}`
+      if (currentLang === 'ar') return `تم التحليل ${n} | يحتوي على GPS ${gps} | معدَّلة ${edited}`
+      return `Parsed ${n} | GPS ${gps} | Edited ${edited}`
+    } catch {
+      return `Parsed ${n} | GPS ${gps} | Edited ${edited}`
+    }
+  }
+
+  function updateStats() {
+    const el = document.getElementById('stats')
+    if (!el) return
+    const cards = Array.from(resultsElement.querySelectorAll('.card'))
+    const n = cards.length
+    const gps = cards.filter(c => c.dataset.hasGps === 'true').length
+    const edited = cards.filter(c => c.querySelector('.file-status [data-status="edited"]')).length
+    el.textContent = composeStatsText(n, gps, edited)
+  }
+
   async function exportAsJSON() {
     if (parsedResults.length === 0) return
     const blob = new Blob([JSON.stringify(parsedResults, null, 2)], { type: 'application/json' })
@@ -704,8 +801,24 @@
 
   async function parseOneFile(file) {
     // Build UI card first for immediate feedback
+    const itemId = `id-${Math.random().toString(36).slice(2, 8)}-${Date.now()}`
     const ui = createCardSkeleton(file)
+    ui.article.dataset.id = itemId
     resultsElement.prepend(ui.article)
+
+    // Always provide remove button
+    const removeBtn = document.createElement('button')
+    removeBtn.className = 'btn danger'
+    removeBtn.textContent = t('removeCard')
+    removeBtn.dataset.action = 'remove-card'
+    removeBtn.addEventListener('click', () => {
+      ui.article.remove()
+      const idx = parsedResults.findIndex(r => r.id === itemId)
+      if (idx >= 0) parsedResults.splice(idx, 1)
+      updateExportButtonsDisabledState()
+      updateStats()
+    })
+    ui.actions.appendChild(removeBtn)
 
     try {
       // Parse EXIF quickly, rotation, GPS, and file bytes in parallel
@@ -761,6 +874,8 @@
           'الحالة',
           t('statusNoExif')
         )
+        // Update stats for cards without EXIF as well
+        updateStats()
         return
       }
 
@@ -771,6 +886,7 @@
       badge.setAttribute('data-status', edited ? 'edited' : 'original')
       badge.textContent = edited ? t('edited') : t('original')
       ui.statusEl.appendChild(badge)
+      ui.article.dataset.edited = String(edited)
 
       const make = exif.Make || exif.make || fallback?.exif?.Make?.description
       const model = exif.Model || exif.model || fallback?.exif?.Model?.description
@@ -810,15 +926,30 @@
         mapLink.target = '_blank'
         mapLink.rel = 'noopener'
         mapLink.textContent = t('map')
+        mapLink.dataset.action = 'map'
         ui.actions.appendChild(mapLink)
         addKV(ui.kv, t('gps'), `${latNum.toFixed(6)}, ${lonNum.toFixed(6)}`)
+        ui.article.dataset.hasGps = 'true'
+        ui.article.dataset.lat = String(latNum)
+        ui.article.dataset.lon = String(lonNum)
+        const copyCoordsBtn = document.createElement('button')
+        copyCoordsBtn.className = 'btn'
+        copyCoordsBtn.textContent = t('copyCoords')
+        copyCoordsBtn.dataset.action = 'copy-coords'
+        copyCoordsBtn.addEventListener('click', async () => {
+          try { await navigator.clipboard.writeText(`${latNum.toFixed(6)}, ${lonNum.toFixed(6)}`); copyCoordsBtn.textContent = t('copied'); setTimeout(() => (copyCoordsBtn.textContent = t('copyCoords')), 1200) }
+          catch { copyCoordsBtn.textContent = t('copyFail'); setTimeout(() => (copyCoordsBtn.textContent = t('copyCoords')), 1200) }
+        })
+        ui.actions.appendChild(copyCoordsBtn)
       } else {
         addKV(ui.kv, t('gps'), '—')
+        ui.article.dataset.hasGps = 'false'
       }
 
       const copyBtn = document.createElement('button')
       copyBtn.className = 'btn'
       copyBtn.textContent = t('copy')
+      copyBtn.dataset.action = 'copy-json'
       copyBtn.addEventListener('click', async () => {
         try {
           const payload2 = { exifr: toSerializableTrimmed(exifrResult), exifreader: toSerializableTrimmed(fallback) }
@@ -849,8 +980,20 @@
         dateTime: (dt instanceof Date ? dt.toISOString() : (dt ?? '')),
         gpsLatitude: (Number.isFinite(Number(gps.latitude)) ? Number(gps.latitude) : ''),
         gpsLongitude: (Number.isFinite(Number(gps.longitude)) ? Number(gps.longitude) : ''),
+        software: software || ''
       }
-      parsedResults.push({ fileName: file.name, fileSize: file.size, summary, exifr: payload.exifr, exifreader: payload.exifreader })
+
+      const copyMainBtn = document.createElement('button')
+      copyMainBtn.className = 'btn'
+      copyMainBtn.textContent = t('copyMain')
+      copyMainBtn.dataset.action = 'copy-main'
+      copyMainBtn.addEventListener('click', async () => {
+        try { await navigator.clipboard.writeText(JSON.stringify(summary, null, 2)); copyMainBtn.textContent = t('copied'); setTimeout(() => (copyMainBtn.textContent = t('copyMain')), 1200) }
+        catch { copyMainBtn.textContent = t('copyFail'); setTimeout(() => (copyMainBtn.textContent = t('copyMain')), 1200) }
+      })
+      ui.actions.appendChild(copyMainBtn)
+
+      parsedResults.push({ id: itemId, fileName: file.name, fileSize: file.size, summary, edited, exifr: payload.exifr, exifreader: payload.exifreader })
 
       // Hashes for file verification
       if (fileAb) {
@@ -944,6 +1087,7 @@
       } catch {}
 
       updateExportButtonsDisabledState()
+      updateStats()
 
     } catch (err) {
       addKV(ui.kv, t('error'), err?.message || 'Parse failed')
@@ -956,11 +1100,37 @@
 
     clearButtonElement.disabled = false
     setDropzoneBusy(true)
+    // let overlay paint before heavy work starts
+    try { await waitForNextFrame(2) } catch {}
 
-    for (const file of fileArray) {
-      // eslint-disable-next-line no-await-in-loop
-      await parseOneFile(file)
+    let completed = 0
+    const total = fileArray.length
+    const dzBusyText = document.getElementById('dz-busy-text')
+    const baseText = (
+      currentLang === 'en' ? 'Processing…' :
+      currentLang === 'zh-Hant' ? '處理中…' :
+      currentLang === 'es' ? 'Procesando…' :
+      currentLang === 'fr' ? 'Traitement…' :
+      'جارٍ المعالجة…'
+    )
+    const updateProgressLabel = () => { if (dzBusyText) dzBusyText.textContent = `${baseText} (${completed}/${total})` }
+    updateProgressLabel()
+
+    const maxConc = Math.max(1, Math.min(3, (navigator.hardwareConcurrency ? Math.floor(navigator.hardwareConcurrency / 2) : 3)))
+    let index = 0
+    async function worker() {
+      while (true) {
+        const i = index; index++
+        if (i >= fileArray.length) break
+        const f = fileArray[i]
+        // eslint-disable-next-line no-await-in-loop
+        await parseOneFile(f)
+        completed++
+        updateProgressLabel()
+      }
     }
+    const workers = Array.from({ length: Math.min(maxConc, total) }, () => worker())
+    await Promise.all(workers)
 
     setDropzoneBusy(false)
   }
@@ -1089,12 +1259,23 @@
   if (exportPdfButton) exportPdfButton.addEventListener('click', exportAsPDF)
   updateExportButtonsDisabledState()
 
+  // Expand/Collapse all JSON blocks
+  const expandAllButton = document.getElementById('expand-all')
+  if (expandAllButton) expandAllButton.addEventListener('click', () => {
+    document.querySelectorAll('details.json-block').forEach(d => { try { d.setAttribute('open', '') } catch {} })
+  })
+  const collapseAllButton = document.getElementById('collapse-all')
+  if (collapseAllButton) collapseAllButton.addEventListener('click', () => {
+    document.querySelectorAll('details.json-block').forEach(d => { try { d.removeAttribute('open') } catch {} })
+  })
+
   // Clear results
   clearButtonElement.addEventListener('click', () => {
     resultsElement.innerHTML = ''
     clearButtonElement.disabled = true
     parsedResults.length = 0
     updateExportButtonsDisabledState()
+    updateStats()
   })
 
   if ('serviceWorker' in navigator) {

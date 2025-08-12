@@ -171,3 +171,5 @@ pre.json{max-height:240px; overflow:auto; background:#0b1326; border:1px solid v
 .spinner{width:28px;height:28px;border-radius:50%;border:3px solid rgba(255,255,255,.25);border-top-color:#fff;animation:spin 1s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
 #dz-busy-text{color:#e7eefc;font-weight:600} 
+
+.stats{color:var(--muted);font-size:13px} 
