@@ -212,7 +212,7 @@
     return `1/${denom}`
   }
 
-  // 新增：判斷是否「可能曾被修改」
+  // Heuristics: detect if image likely edited (time delta, software tag)
   function isLikelyEdited(exif, fallback) {
     try {
       const dto = exif?.DateTimeOriginal || exif?.CreateDate
@@ -230,8 +230,8 @@
     } catch { return false }
   }
 
-  // 新增：從 ExifReader 標籤嘗試抽出可顯示的預覽 JPEG
-  function trySetRawPreviewFromFallback(ui, fallback) {
+  // Try to extract an embeddable preview from RAW using ExifReader
+  async function trySetRawPreviewFromFallback(ui, fallback) {
     try {
       if (!fallback) return
       const candidates = [
@@ -258,7 +258,7 @@
     } catch {}
   }
 
-  // 新增：計算 MD5 與 SHA-256
+  // Compute hashes for integrity checks
   async function computeHashesFromArrayBuffer(ab) {
     const md5 = (window.SparkMD5 && window.SparkMD5.ArrayBuffer) ? window.SparkMD5.ArrayBuffer.hash(ab) : ''
     let sha256 = ''
@@ -358,7 +358,7 @@
     return { k, v }
   }
 
-  // 重新渲染既有卡片的欄位名稱（值不變）
+  // Re-render keys on language change; keep values intact
   function rerenderAllCardsLabels() {
     const keyMap = new Map([
       ['Camera', 'camera'], ['相機', 'camera'], ['Cámara', 'camera'],
@@ -406,7 +406,7 @@
       })
   }
 
-  // 序列化與過濾
+  // Serialize with aggressive trimming (omit binary/huge fields)
   function toSerializableTrimmed(obj) {
     const OMIT_KEYS = new Set([
       'ApplicationNotes','XMLPacket','MakerNote','UserComment','Thumbnail','image','ImageData','ICC','ICCProfile','ICC_Profile',
@@ -448,7 +448,7 @@
     return undefined
   }
 
-  // 匯出輔助
+  // Export helpers
   function nowTimestamp() {
     const d = new Date()
     const pad = n => String(n).padStart(2, '0')
@@ -612,10 +612,12 @@
   }
 
   async function parseOneFile(file) {
+    // Build UI card first for immediate feedback
     const ui = createCardSkeleton(file)
     resultsElement.prepend(ui.article)
 
     try {
+      // Parse EXIF quickly, rotation, GPS, and file bytes in parallel
       const [exifrResult, rotation, exifrGps, fileAb] = await Promise.all([
         exifrLib.parse(file, true).catch(() => undefined),
         exifrLib.rotation(file).catch(() => undefined),
@@ -627,7 +629,7 @@
         ui.img.style.transform = `rotate(${rotation.deg}deg) scale(${rotation.scaleX}, ${rotation.scaleY})`
       }
 
-      // Try ExifReader fallback if needed
+      // Use ExifReader as a fallback and also for RAW preview
       let exif = exifrResult
       let fallback = undefined
       let gps = {}
@@ -648,12 +650,12 @@
           if (!exif) exif = fallback
           const gpsFromFallback = pickGpsFromExifReader(fallback)
           if (gpsFromFallback) gps = gpsFromFallback
-          if (needsPreview) trySetRawPreviewFromFallback(ui, fallback)
+          if (needsPreview) await trySetRawPreviewFromFallback(ui, fallback)
         } catch {}
       }
 
       if (!exif) {
-        // 狀態徽章：無 EXIF
+        // No EXIF at all
         const badge = document.createElement('span')
         badge.className = 'badge'
         badge.setAttribute('data-status', 'no-exif')
@@ -663,7 +665,7 @@
         return
       }
 
-      // 狀態徽章：已修改 / 原始
+      // Edited/Original status badge
       const edited = isLikelyEdited(exif, fallback)
       const badge = document.createElement('span')
       badge.className = `badge ${edited ? 'danger' : 'success'}`
@@ -690,14 +692,14 @@
       addKV(ui.kv, t('camera'), [make, model].filter(Boolean).join(' '))
       addKV(ui.kv, t('lens'), lens || '')
       const timeRow = addKV(ui.kv, t('time'), formatDate(dt))
-      if (timeSuspect) { timeRow.k.classList.add('is-suspect'); timeRow.v.classList.add('is-suspect'); timeRow.v.title = 'Date mismatch (Modify vs Original)'; }
+      if (timeSuspect) { timeRow.k.classList.add('is-suspect'); timeRow.v.classList.add('is-suspect'); timeRow.v.title = 'Modify time differs from original by > 2 min' }
       addKV(ui.kv, t('iso'), iso ? String(iso) : '')
       const exposureValue = (typeof exposure === 'number' ? exposure : Number(exposure))
       addKV(ui.kv, t('shutter'), formatExposureTime(exposureValue))
       addKV(ui.kv, t('focal'), focal ? `${String(focal)} mm` : '')
       if (software) {
         const swRow = addKV(ui.kv, t('software'), software)
-        if (swSuspect) { swRow.k.classList.add('is-suspect'); swRow.v.classList.add('is-suspect'); swRow.v.title = 'Edited by software'; }
+        if (swSuspect) { swRow.k.classList.add('is-suspect'); swRow.v.classList.add('is-suspect'); swRow.v.title = 'Edited by software' }
       }
 
       const latNum = Number(gps.latitude)
@@ -734,7 +736,7 @@
       const payload = { exifr: toSerializableTrimmed(exifrResult), exifreader: toSerializableTrimmed(fallback) }
       ui.jsonPre.textContent = JSON.stringify(payload, null, 2)
 
-      // 收集彙整資料供匯出
+      // Summary for CSV/JSON export
       const summary = {
         fileName: file.name,
         fileSize: file.size,
@@ -751,7 +753,7 @@
       }
       parsedResults.push({ fileName: file.name, fileSize: file.size, summary, exifr: payload.exifr, exifreader: payload.exifreader })
 
-      // 新增：雜湊值
+      // Hashes for file verification
       if (fileAb) {
         try {
           const { md5, sha256 } = await computeHashesFromArrayBuffer(fileAb)
@@ -760,7 +762,7 @@
         } catch {}
       }
 
-      // 新增：RAW 專屬資訊（副檔名偵測）
+      // RAW-only extras
       const ext = (file.name.split('.').pop() || '').toLowerCase()
       const isRaw = ['nef','cr2','cr3','arw','raf','rw2','orf','dng','srw','pef'].includes(ext)
       if (isRaw) {
@@ -773,11 +775,11 @@
         if (wb != null) addKV(ui.kv, t('whiteBalance'), String(wb))
       }
 
-      // 新增：數位簽章/雜湊存在提示（DNG Digest 等）
+      // Digital signature or digests presence
       const rawDigest = fallback?.exif?.OriginalRawFileDigest || exif?.OriginalRawFileDigest || fallback?.exif?.RawImageDigest || exif?.RawImageDigest
       addKV(ui.kv, t('digitalSignature'), rawDigest ? t('signaturePresent') : t('signatureAbsent'))
 
-      // 新增：MakerNote 概覽（長度與前幾位元組）
+      // MakerNote snippet (first 64 bytes) and a few readable entries
       try {
         const mn = fallback?.exif?.MakerNote
         const val = mn?.value
@@ -795,10 +797,8 @@
           makerWrap.appendChild(title)
           makerWrap.appendChild(pre)
         }
-        // 進一步：嘗試列出可讀的 MakerNote 欄位（description）
         const infoPairs = []
         const maybeGroups = [fallback?.makernote, fallback?.makerNote]
-        // 也掃描其他群組中帶有 vendor 相關鍵
         for (const [gk, gv] of Object.entries(fallback || {})) {
           if (!gv || typeof gv !== 'object') continue
           const name = String(gk).toLowerCase()
@@ -934,7 +934,7 @@
     })
   }
 
-  // Wire paste button and global Ctrl+V when focus is not on input elements
+  // Global paste: support traditional paste and Clipboard API when not typing
   if (pasteButton) pasteButton.addEventListener('click', () => handleClipboardPaste())
   window.addEventListener('paste', async e => {
     try {
@@ -955,7 +955,7 @@
     } catch {}
   })
 
-  // Events: drag & drop
+  // Drag & drop events
   ;['dragenter','dragover'].forEach(evt => {
     dropzoneElement.addEventListener(evt, e => { e.preventDefault(); e.stopPropagation(); dropzoneElement.classList.add('is-dragover') })
   })

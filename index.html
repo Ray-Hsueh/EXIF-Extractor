@@ -9,10 +9,10 @@
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%93%B7%3C/text%3E%3C/svg%3E">
   <script src="https://cdn.jsdelivr.net/npm/exifr/dist/full.umd.js" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/exifreader/dist/exif-reader.js" defer></script>
-  <!-- 新增：PDF 與 MD5 library -->
+  <!-- PDF and hashing libs -->
   <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/spark-md5@3.0.2/spark-md5.min.js" defer></script>
-  <!-- 新增：將卡片渲染成圖片以輸出 PDF（避免亂碼） -->
+  <!-- Render DOM to image for pretty PDF -->
   <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js" defer></script>
   <script src="./app.js" defer></script>
 </head>
@@ -27,7 +27,7 @@
           <button class="segment" data-lang="zh-Hant" aria-pressed="false">中文</button>
           <button class="segment" data-lang="es" aria-pressed="false">ES</button>
         </div>
-        <!-- GitHub repo link button -->
+        <!-- GitHub repo link -->
         <a id="repo-link" class="btn github-btn" href="https://github.com/Ray-Hsueh/EXIF-Extractor" target="_blank" rel="noopener" aria-label="View repository on GitHub">
           <svg viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M8 0C3.58 0 0 3.58 0 8a8 8 0 0 0 5.47 7.59c.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2 .37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.01.08-2.11 0 0 .67-.21 2.2.82a7.54 7.54 0 0 1 2 0c1.53-1.03 2.2-.82 2.2-.82.44 1.1.16 1.91.08 2.11.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8 8 0 0 0 16 8c0-4.42-3.58-8-8-8z"></path></svg>
           <span>GitHub</span>
@@ -38,9 +38,17 @@
 
   <main class="container">
     <section class="uploader-section">
+      <div class="toolbar toolbar-top-right">
+        <button id="export-json" class="btn">Export JSON</button>
+        <button id="export-csv" class="btn">Export CSV</button>
+        <button id="export-pdf" class="btn">Export PDF</button>
+        <div class="toolbar-sep" role="separator" aria-orientation="vertical"></div>
+        <button id="clear-button" class="btn" disabled>Clear results</button>
+      </div>
+
       <div id="dropzone" class="dropzone" tabindex="0" role="button" aria-label="Drag and drop or click to upload photos">
         <div class="dz-instructions">
-          <!-- 新增：拖曳區圖示 -->
+          <!-- Uploader icon -->
           <div class="dz-icon" aria-hidden="true">
             <svg viewBox="0 0 48 48" width="56" height="56" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M33 30v6a6 6 0 0 1-6 6H13a6 6 0 0 1-6-6V24a6 6 0 0 1 6-6h4l3-4h7a6 6 0 0 1 6 6"/>
@@ -54,32 +62,24 @@
             <input id="file-input" type="file" accept="image/*,.heic,.heif,.avif,.tif,.tiff,.jpg,.jpeg,.png,.nef,.cr2,.cr3,.arw,.raf,.rw2,.orf,.dng" multiple hidden>
             <span id="browse-label">Choose files</span>
           </label>
-          <!-- 提示改為拖曳時自動顯示 -->
+          <!-- Shown on drag-over/focus -->
           <div class="dz-tooltip" id="dz-tooltip" role="tooltip">Supports JPG, PNG, HEIC, AVIF, TIFF… Recommended single file ≤ 50MB.</div>
         </div>
       </div>
-      <div class="toolbar">
-        <!-- New URL and Paste controls -->
+      <div class="toolbar toolbar-url">
+        <!-- URL/Paste controls centered below the dropzone -->
         <input id="url-input" class="text-input" type="url" placeholder="Paste image URL (CORS required)" aria-label="Image URL">
         <button id="analyze-url" class="btn">Analyze URL</button>
         <button id="paste-button" class="btn">Paste image</button>
-        <button id="export-json" class="btn">Export JSON</button>
-        <button id="export-csv" class="btn">Export CSV</button>
-        <!-- 新增：PDF 匯出按鈕 -->
-        <button id="export-pdf" class="btn">Export PDF</button>
-        <div class="toolbar-sep" role="separator" aria-orientation="vertical"></div>
-        <!-- Existing clear button -->
-        <button id="clear-button" class="btn" disabled>Clear results</button>
       </div>
     </section>
 
     <section id="results" class="results" aria-live="polite"></section>
   </main>
 
-  <!-- 離屏 PDF 報告容器（渲染後即丟棄） -->
+  <!-- Off-screen container to render pretty PDF pages -->
   <div id="pdf-report-root" class="pdf-report-root" aria-hidden="true"></div>
 
-  <!-- 移除原本的 Powered by exifr footer -->
   <noscript>
     JavaScript is required to use this tool.
   </noscript>

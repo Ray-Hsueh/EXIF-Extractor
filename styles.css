@@ -44,6 +44,10 @@ body{
 
 .toolbar{display:flex; gap:12px; margin-top:14px; align-items:center; flex-wrap:wrap}
 .toolbar-sep{width:1px;height:28px;background:var(--border);margin:0 6px}
+.toolbar-top-right{justify-content:flex-end}
+.toolbar-url{justify-content:center}
+/* 與拖曳區保持距離 */
+.uploader-section .toolbar-top-right{margin-bottom:12px}
 .btn{
   appearance:none; border:1px solid var(--border); background:#0e1629; color:var(--text);
   padding:8px 12px; border-radius:10px; cursor:pointer; transition:.15s ease all;
@@ -149,6 +153,8 @@ pre.json{max-height:240px; overflow:auto; background:#0b1326; border:1px solid v
   .card-header{flex-direction:row; align-items:center; border-right:none; border-bottom:1px solid var(--border); min-width:auto; padding:12px; gap:10px}
   .file-thumb{width:96px;height:96px}
   .kv{grid-template-columns:100px 1fr}
+  .toolbar-top-right{justify-content:center}
+  .toolbar-url{justify-content:center}
 } 
 
 .text-input{ 
