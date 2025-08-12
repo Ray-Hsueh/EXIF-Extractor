@@ -343,7 +343,12 @@
   }
 
   function setDropzoneBusy(isBusy) {
-    dropzoneElement.classList.toggle('is-busy', Boolean(isBusy))
+    const busy = Boolean(isBusy)
+    dropzoneElement.classList.toggle('is-busy', busy)
+    const dzBusy = document.getElementById('dz-busy')
+    const dzBusyText = document.getElementById('dz-busy-text')
+    if (dzBusy) dzBusy.setAttribute('aria-hidden', busy ? 'false' : 'true')
+    if (dzBusyText) dzBusyText.textContent = (currentLang === 'en' ? 'Processing…' : (currentLang === 'zh-Hant' ? '處理中…' : 'Procesando…'))
   }
 
   function addKV(kv, key, value) {

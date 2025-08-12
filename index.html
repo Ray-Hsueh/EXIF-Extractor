@@ -65,6 +65,11 @@
           <!-- Shown on drag-over/focus -->
           <div class="dz-tooltip" id="dz-tooltip" role="tooltip">Supports JPG, PNG, HEIC, AVIF, TIFF… Recommended single file ≤ 50MB.</div>
         </div>
+        <!-- Busy indicator overlay (visible while processing) -->
+        <div class="dz-busy" id="dz-busy" role="status" aria-live="polite" aria-atomic="true" aria-hidden="true">
+          <div class="spinner" aria-hidden="true"></div>
+          <span id="dz-busy-text">Processing…</span>
+        </div>
       </div>
       <div class="toolbar toolbar-url">
         <!-- URL/Paste controls centered below the dropzone -->

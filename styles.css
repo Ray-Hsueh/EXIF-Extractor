@@ -163,3 +163,11 @@ pre.json{max-height:240px; overflow:auto; background:#0b1326; border:1px solid v
   background:#0e1629; color:var(--text);
 }
 .text-input:focus{outline:none; border-color:var(--accent); box-shadow:0 0 0 4px rgba(79,140,255,.15)} 
+
+.dropzone{position:relative}
+/* Busy overlay */
+.dz-busy{position:absolute;inset:0;background:rgba(11,16,32,.72);backdrop-filter:saturate(120%) blur(2px);display:none;align-items:center;justify-content:center;flex-direction:column;gap:10px;border-radius:14px}
+.dropzone.is-busy .dz-busy{display:flex}
+.spinner{width:28px;height:28px;border-radius:50%;border:3px solid rgba(255,255,255,.25);border-top-color:#fff;animation:spin 1s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+#dz-busy-text{color:#e7eefc;font-weight:600} 
