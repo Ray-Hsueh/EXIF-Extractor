@@ -474,10 +474,11 @@
   }
   function toCsvRow(arr) { return arr.map(toCsvCell).join(',') }
   function updateExportButtonsDisabledState() {
-    const disabled = parsedResults.length === 0
-    if (exportJsonButton) exportJsonButton.disabled = disabled
-    if (exportCsvButton) exportCsvButton.disabled = disabled
-    if (exportPdfButton) exportPdfButton.disabled = disabled
+    const noParsed = parsedResults.length === 0
+    const noCards = resultsElement.querySelectorAll('.card').length === 0
+    if (exportJsonButton) exportJsonButton.disabled = noParsed
+    if (exportCsvButton) exportCsvButton.disabled = noParsed
+    if (exportPdfButton) exportPdfButton.disabled = noCards
   }
   async function exportAsJSON() {
     if (parsedResults.length === 0) return
@@ -504,7 +505,8 @@
   }
   async function exportAsPDF() {
     try {
-      if (!parsedResults.length) return
+      const cards = Array.from(document.querySelectorAll('.card'))
+      if (!cards.length) return
       const jsPDF = window.jspdf && window.jspdf.jsPDF
       if (!jsPDF) { alert('jsPDF not loaded'); return }
       if (!window.html2canvas) { alert('html2canvas not loaded'); return }
@@ -517,8 +519,6 @@
       const root = document.getElementById('pdf-report-root')
       if (!root) { alert('root missing'); return }
       root.innerHTML = ''
-
-      const cards = Array.from(document.querySelectorAll('.card'))
 
       function mk(k, cls, text){ const el = document.createElement(k); if (cls) el.className = cls; if (text != null) el.textContent = text; return el }
       function line(k,v){
