@@ -16,6 +16,7 @@
   const pasteButton = document.getElementById('paste-button')
   const exportJsonButton = document.getElementById('export-json')
   const exportCsvButton = document.getElementById('export-csv')
+  const exportPdfButton = document.getElementById('export-pdf')
   const browseLabelElement = document.querySelector('.browse-button')
   const langSegmentButtons = Array.from(document.querySelectorAll('.segmented .segment'))
 
@@ -43,6 +44,13 @@
       edited: 'Edited',
       original: 'Original',
       noExifShort: 'No EXIF',
+      // new labels
+      software: 'Software',
+      rawInfo: 'RAW details', bitDepth: 'Bit depth', compression: 'Compression', whiteBalance: 'White balance',
+      makerNote: 'MakerNote',
+      hashMD5: 'MD5', hashSHA256: 'SHA-256',
+      digitalSignature: 'Digital signature', signaturePresent: 'Present', signatureAbsent: 'Not detected',
+      exportPDF: 'Export PDF',
     },
     'zh-Hant': {
       title: 'EXIF 解析器',
@@ -66,6 +74,13 @@
       edited: '已修改',
       original: '原始',
       noExifShort: '無 EXIF',
+      // new labels
+      software: '軟體',
+      rawInfo: 'RAW 詳細', bitDepth: '位元深度', compression: '壓縮模式', whiteBalance: '白平衡',
+      makerNote: 'MakerNote',
+      hashMD5: 'MD5', hashSHA256: 'SHA-256',
+      digitalSignature: '數位簽章', signaturePresent: '已偵測', signatureAbsent: '未偵測',
+      exportPDF: '匯出 PDF',
     },
     'es': {
       title: 'Extractor EXIF',
@@ -89,6 +104,13 @@
       edited: 'Editado',
       original: 'Original',
       noExifShort: 'Sin EXIF',
+      // new labels
+      software: 'Software',
+      rawInfo: 'Detalles RAW', bitDepth: 'Profundidad de bits', compression: 'Compresión', whiteBalance: 'Balance de blancos',
+      makerNote: 'MakerNote',
+      hashMD5: 'MD5', hashSHA256: 'SHA-256',
+      digitalSignature: 'Firma digital', signaturePresent: 'Presente', signatureAbsent: 'No detectado',
+      exportPDF: 'Exportar PDF',
     }
   }
   let currentLang = 'en'
@@ -118,6 +140,10 @@
     if (urlInputElement) urlInputElement.placeholder = t('urlPlaceholder')
     if (exportJsonButton) exportJsonButton.textContent = t('exportJSON')
     if (exportCsvButton) exportCsvButton.textContent = t('exportCSV')
+    if (exportPdfButton) exportPdfButton.textContent = t('exportPDF')
+    // tooltip content for supported formats
+    const dzTooltip = document.getElementById('dz-tooltip')
+    if (dzTooltip) dzTooltip.textContent = t('hint')
   }
 
   applyStaticTexts()
@@ -204,6 +230,47 @@
     } catch { return false }
   }
 
+  // 新增：從 ExifReader 標籤嘗試抽出可顯示的預覽 JPEG
+  function trySetRawPreviewFromFallback(ui, fallback) {
+    try {
+      if (!fallback) return
+      const candidates = [
+        fallback?.exif?.JpgFromRaw?.value,
+        fallback?.exif?.PreviewImage?.value,
+        fallback?.thumbnail?.ThumbnailImage?.value,
+      ]
+      let bytes = candidates.find(v => v && (v.byteLength || (Array.isArray(v) && v.length) || (v.buffer && v.byteLength !== undefined)))
+      if (!bytes) return
+      if (bytes instanceof ArrayBuffer) bytes = new Uint8Array(bytes)
+      else if (bytes.buffer instanceof ArrayBuffer && bytes.byteLength !== undefined) bytes = new Uint8Array(bytes.buffer, bytes.byteOffset || 0, bytes.byteLength)
+      if (!bytes || !bytes.byteLength) return
+      const blob = new Blob([bytes], { type: 'image/jpeg' })
+      const url = URL.createObjectURL(blob)
+      const existingFallback = ui.header.querySelector('.file-thumb-fallback')
+      const existingImg = ui.header.querySelector('img.file-thumb')
+      const newImg = document.createElement('img')
+      newImg.className = 'file-thumb'
+      newImg.alt = existingImg?.alt || ''
+      newImg.src = url
+      newImg.addEventListener('load', () => setTimeout(() => URL.revokeObjectURL(url), 1000), { once: true })
+      if (existingFallback) existingFallback.replaceWith(newImg)
+      else if (existingImg && existingImg.naturalWidth === 0) existingImg.replaceWith(newImg)
+    } catch {}
+  }
+
+  // 新增：計算 MD5 與 SHA-256
+  async function computeHashesFromArrayBuffer(ab) {
+    const md5 = (window.SparkMD5 && window.SparkMD5.ArrayBuffer) ? window.SparkMD5.ArrayBuffer.hash(ab) : ''
+    let sha256 = ''
+    try {
+      if (crypto && crypto.subtle && ab) {
+        const digest = await crypto.subtle.digest('SHA-256', ab)
+        sha256 = Array.from(new Uint8Array(digest)).map(b => b.toString(16).padStart(2, '0')).join('')
+      }
+    } catch {}
+    return { md5, sha256 }
+  }
+
   function createCardSkeleton(file) {
     const article = document.createElement('article')
     article.className = 'card'
@@ -288,6 +355,7 @@
     v.textContent = value ?? ''
     kv.appendChild(k)
     kv.appendChild(v)
+    return { k, v }
   }
 
   // 重新渲染既有卡片的欄位名稱（值不變）
@@ -303,6 +371,7 @@
       ['GPS', 'gps'],
       ['Error', 'error'], ['錯誤', 'error'], ['Error', 'error'],
       ['Status', 'status'], ['狀態', 'status'], ['Estado', 'status'],
+      ['Software', 'software'], ['軟體', 'software'], ['Software', 'software'],
     ])
     resultsElement.querySelectorAll('.card .kv .key').forEach(el => {
       const key = keyMap.get(el.textContent) || el.textContent
@@ -317,6 +386,7 @@
         case 'gps': el.textContent = t('gps'); break
         case 'error': el.textContent = t('error'); break
         case 'status': el.textContent = (currentLang === 'en' ? 'Status' : (currentLang === 'zh-Hant' ? '狀態' : 'Estado')); break
+        case 'software': el.textContent = t('software'); break
         default: break
       }
     })
@@ -407,8 +477,9 @@
     const disabled = parsedResults.length === 0
     if (exportJsonButton) exportJsonButton.disabled = disabled
     if (exportCsvButton) exportCsvButton.disabled = disabled
+    if (exportPdfButton) exportPdfButton.disabled = disabled
   }
-  function exportAsJSON() {
+  async function exportAsJSON() {
     if (parsedResults.length === 0) return
     const blob = new Blob([JSON.stringify(parsedResults, null, 2)], { type: 'application/json' })
     downloadBlob(blob, `exif-export-${nowTimestamp()}.json`)
@@ -431,16 +502,125 @@
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' })
     downloadBlob(blob, `exif-export-${nowTimestamp()}.csv`)
   }
+  async function exportAsPDF() {
+    try {
+      if (!parsedResults.length) return
+      const jsPDF = window.jspdf && window.jspdf.jsPDF
+      if (!jsPDF) { alert('jsPDF not loaded'); return }
+      if (!window.html2canvas) { alert('html2canvas not loaded'); return }
+
+      const doc = new jsPDF({ unit: 'pt', format: 'a4' })
+      const pageW = doc.internal.pageSize.getWidth()
+      const pageH = doc.internal.pageSize.getHeight()
+      const margin = 24
+
+      const root = document.getElementById('pdf-report-root')
+      if (!root) { alert('root missing'); return }
+      root.innerHTML = ''
+
+      const cards = Array.from(document.querySelectorAll('.card'))
+
+      function mk(k, cls, text){ const el = document.createElement(k); if (cls) el.className = cls; if (text != null) el.textContent = text; return el }
+      function line(k,v){
+        const kEl = mk('div','key',k)
+        const vEl = mk('div','val',v)
+        return [kEl,vEl]
+      }
+
+      for (let idx = 0; idx < cards.length; idx++) {
+        const card = cards[idx]
+        // 讀取原卡片資訊
+        const name = card.querySelector('.file-name')?.textContent || ''
+        const size = card.querySelector('.file-size')?.textContent || ''
+        const statusText = card.querySelector('.file-status .badge')?.textContent || ''
+        const statusIsDanger = card.querySelector('.file-status .badge')?.classList.contains('danger')
+        const imgEl = card.querySelector('img.file-thumb')
+
+        const tablePairs = []
+        const keys = Array.from(card.querySelectorAll('.kv .key')).map(k => k.textContent)
+        const vals = Array.from(card.querySelectorAll('.kv .val')).map(v => v.textContent)
+        for (let i=0;i<Math.min(keys.length, vals.length);i++) {
+          const k = keys[i]; const v = vals[i]
+          // 過濾掉 Status/JSON 之類不必要的
+          if (!k || !v) continue
+          tablePairs.push([k, v])
+        }
+
+        // 建立漂亮頁面 DOM
+        const page = mk('div','pdf-page')
+        const header = mk('div','pdf-header')
+        header.appendChild(mk('div','pdf-title','EXIF Report'))
+        const meta = mk('div','pdf-meta', new Date().toLocaleString())
+        header.appendChild(meta)
+        page.appendChild(header)
+
+        const body = mk('div','pdf-body')
+        const left = mk('div')
+        // 縮圖
+        if (imgEl) {
+          const thumb = mk('img','pdf-thumb')
+          try {
+            const c = document.createElement('canvas')
+            const w = imgEl.naturalWidth || 0
+            const h = imgEl.naturalHeight || 0
+            if (w > 0 && h > 0) {
+              c.width = w; c.height = h
+              const ctx = c.getContext('2d')
+              if (ctx) { ctx.drawImage(imgEl, 0, 0, w, h); thumb.src = c.toDataURL('image/jpeg', 0.92) }
+            } else {
+              thumb.src = imgEl.src
+            }
+          } catch { thumb.src = imgEl.src }
+          left.appendChild(thumb)
+        }
+        // 檔名/大小/狀態
+        const fileinfo = mk('div','pdf-fileinfo', `${name}\n${size}`)
+        left.appendChild(fileinfo)
+        if (statusText) {
+          const badge = mk('span',`pdf-badge ${statusIsDanger ? 'danger' : ''}`, statusText)
+          left.appendChild(badge)
+        }
+        body.appendChild(left)
+
+        const right = mk('div')
+        const sec1 = mk('div','pdf-section')
+        sec1.appendChild(mk('div','pdf-section-title','Metadata'))
+        const table = mk('div','pdf-table')
+        tablePairs.forEach(([k,v]) => { const [a,b] = line(k,v); table.appendChild(a); table.appendChild(b) })
+        sec1.appendChild(table)
+        right.appendChild(sec1)
+        body.appendChild(right)
+
+        const footer = mk('div','pdf-footer', `Generated by EXIF Extractor • ${location.href}`)
+
+        page.appendChild(body)
+        page.appendChild(footer)
+        root.appendChild(page)
+
+        // 轉為 canvas 並加入 PDF（同步逐頁）
+        const canvas = await window.html2canvas(page, { backgroundColor: '#ffffff', scale: 2, useCORS: true, allowTaint: true })
+        const imgData = canvas.toDataURL('image/jpeg', 0.95)
+        const imgW = pageW - margin * 2
+        const imgH = Math.min(pageH - margin * 2, Math.round(canvas.height * (imgW / canvas.width)))
+        if (idx > 0) doc.addPage()
+        doc.addImage(imgData, 'JPEG', margin, (pageH - imgH) / 2, imgW, imgH)
+      }
+
+      doc.save(`exif-report-${nowTimestamp()}.pdf`)
+      root.innerHTML = ''
+    } catch {}
+  }
 
   async function parseOneFile(file) {
     const ui = createCardSkeleton(file)
     resultsElement.prepend(ui.article)
 
     try {
-      const [exifrResult, rotation, exifrGps] = await Promise.all([
+      const [exifrResult, rotation, exifrGps, fileAb] = await Promise.all([
         exifrLib.parse(file, true).catch(() => undefined),
         exifrLib.rotation(file).catch(() => undefined),
         exifrLib.gps ? exifrLib.gps(file).catch(() => undefined) : Promise.resolve(undefined),
+        file.arrayBuffer().catch(() => undefined),
       ])
 
       if (rotation && rotation.css) {
@@ -460,12 +640,15 @@
         }
       }
 
-      if ((!exif || (gps.latitude == null || gps.longitude == null)) && ExifReader) {
+      const needsPreview = !!ui.header.querySelector('.file-thumb-fallback')
+      if (((!exif || (gps.latitude == null || gps.longitude == null)) || needsPreview) && ExifReader) {
         try {
-          fallback = await ExifReader.load(await file.arrayBuffer(), { expanded: true })
+          const ab = fileAb || await file.arrayBuffer()
+          fallback = await ExifReader.load(ab, { expanded: true })
           if (!exif) exif = fallback
           const gpsFromFallback = pickGpsFromExifReader(fallback)
           if (gpsFromFallback) gps = gpsFromFallback
+          if (needsPreview) trySetRawPreviewFromFallback(ui, fallback)
         } catch {}
       }
 
@@ -496,14 +679,26 @@
       const exposure = exif.ExposureTime || exif.ShutterSpeedValue || exif.exposureTime || fallback?.exif?.ExposureTime?.description
       const focal = exif.FocalLengthIn35mmFormat || exif.FocalLength || exif.focalLength || fallback?.exif?.FocalLength?.description
       const dt = exif.DateTimeOriginal || exif.CreateDate || exif.ModifyDate || fallback?.exif?.DateTimeOriginal?.description
+      const softwareRaw = exif.Software || exif.ProcessingSoftware || fallback?.exif?.Software?.description || fallback?.exif?.ProcessingSoftware?.description
+      const software = typeof softwareRaw === 'string' ? softwareRaw : String(softwareRaw || '')
+      const dto = exif?.DateTimeOriginal || exif?.CreateDate
+      const mdt = exif?.ModifyDate
+      const timeSuspect = (dto instanceof Date && mdt instanceof Date) ? (Math.abs(mdt - dto) > 2 * 60 * 1000) : false
+      const editorKeywords = ['Adobe', 'Lightroom', 'Photoshop', 'GIMP', 'Affinity', 'Pixelmator', 'Snapseed', 'WhatsApp', 'Instagram', 'LINE', 'VSCO', 'Afterlight', 'Canva']
+      const swSuspect = software && editorKeywords.some(k => software.includes(k))
 
       addKV(ui.kv, t('camera'), [make, model].filter(Boolean).join(' '))
       addKV(ui.kv, t('lens'), lens || '')
-      addKV(ui.kv, t('time'), formatDate(dt))
+      const timeRow = addKV(ui.kv, t('time'), formatDate(dt))
+      if (timeSuspect) { timeRow.k.classList.add('is-suspect'); timeRow.v.classList.add('is-suspect'); timeRow.v.title = 'Date mismatch (Modify vs Original)'; }
       addKV(ui.kv, t('iso'), iso ? String(iso) : '')
       const exposureValue = (typeof exposure === 'number' ? exposure : Number(exposure))
       addKV(ui.kv, t('shutter'), formatExposureTime(exposureValue))
       addKV(ui.kv, t('focal'), focal ? `${String(focal)} mm` : '')
+      if (software) {
+        const swRow = addKV(ui.kv, t('software'), software)
+        if (swSuspect) { swRow.k.classList.add('is-suspect'); swRow.v.classList.add('is-suspect'); swRow.v.title = 'Edited by software'; }
+      }
 
       const latNum = Number(gps.latitude)
       const lonNum = Number(gps.longitude)
@@ -555,6 +750,100 @@
         gpsLongitude: (Number.isFinite(Number(gps.longitude)) ? Number(gps.longitude) : ''),
       }
       parsedResults.push({ fileName: file.name, fileSize: file.size, summary, exifr: payload.exifr, exifreader: payload.exifreader })
+
+      // 新增：雜湊值
+      if (fileAb) {
+        try {
+          const { md5, sha256 } = await computeHashesFromArrayBuffer(fileAb)
+          if (md5) addKV(ui.kv, 'MD5', md5)
+          if (sha256) addKV(ui.kv, 'SHA-256', sha256)
+        } catch {}
+      }
+
+      // 新增：RAW 專屬資訊（副檔名偵測）
+      const ext = (file.name.split('.').pop() || '').toLowerCase()
+      const isRaw = ['nef','cr2','cr3','arw','raf','rw2','orf','dng','srw','pef'].includes(ext)
+      if (isRaw) {
+        const bits = exif.BitsPerSample || fallback?.exif?.BitsPerSample?.description
+        const bitDepth = Array.isArray(bits) ? Math.max(...bits.map(Number).filter(Number.isFinite)) : Number(bits)
+        const comp = exif.Compression || fallback?.exif?.Compression?.description
+        const wb = exif.WhiteBalance ?? fallback?.exif?.WhiteBalance?.description
+        if (bitDepth) addKV(ui.kv, t('bitDepth'), String(bitDepth))
+        if (comp != null) addKV(ui.kv, t('compression'), String(comp))
+        if (wb != null) addKV(ui.kv, t('whiteBalance'), String(wb))
+      }
+
+      // 新增：數位簽章/雜湊存在提示（DNG Digest 等）
+      const rawDigest = fallback?.exif?.OriginalRawFileDigest || exif?.OriginalRawFileDigest || fallback?.exif?.RawImageDigest || exif?.RawImageDigest
+      addKV(ui.kv, t('digitalSignature'), rawDigest ? t('signaturePresent') : t('signatureAbsent'))
+
+      // 新增：MakerNote 概覽（長度與前幾位元組）
+      try {
+        const mn = fallback?.exif?.MakerNote
+        const val = mn?.value
+        const bytes = val ? (val instanceof ArrayBuffer ? new Uint8Array(val) : (val.buffer ? new Uint8Array(val.buffer, val.byteOffset || 0, val.byteLength) : undefined)) : undefined
+        let makerWrap = null
+        if (bytes && bytes.byteLength) {
+          makerWrap = document.createElement('div')
+          makerWrap.className = 'makernote'
+          const title = document.createElement('div')
+          title.className = 'title'
+          title.textContent = `${t('makerNote')} (${bytes.byteLength} bytes)`
+          const pre = document.createElement('pre')
+          const head = Array.from(bytes.slice(0, 64)).map(b => b.toString(16).padStart(2, '0')).join(' ')
+          pre.textContent = `${head}${bytes.byteLength > 64 ? ' …' : ''}`
+          makerWrap.appendChild(title)
+          makerWrap.appendChild(pre)
+        }
+        // 進一步：嘗試列出可讀的 MakerNote 欄位（description）
+        const infoPairs = []
+        const maybeGroups = [fallback?.makernote, fallback?.makerNote]
+        // 也掃描其他群組中帶有 vendor 相關鍵
+        for (const [gk, gv] of Object.entries(fallback || {})) {
+          if (!gv || typeof gv !== 'object') continue
+          const name = String(gk).toLowerCase()
+          if (['exif','gps','thumbnail','interop','interoperability','iptc','xmp','icc','file'].includes(name)) continue
+          if (name.includes('maker') || name.includes('canon') || name.includes('nikon') || name.includes('sony') || name.includes('fujifilm') || name.includes('panasonic') || name.includes('olympus') || name.includes('pentax') || name.includes('leica')) {
+            maybeGroups.push(gv)
+          }
+        }
+        const seen = new Set()
+        for (const group of maybeGroups) {
+          if (!group || typeof group !== 'object') continue
+          for (const [k, v] of Object.entries(group)) {
+            if (seen.has(k)) continue
+            const desc = (v && (v.description != null ? v.description : v.value))
+            if (desc == null) continue
+            const valStr = Array.isArray(desc) ? desc.join(', ') : String(desc)
+            if (valStr && valStr !== '[object Object]') {
+              infoPairs.push([k, valStr])
+              seen.add(k)
+              if (infoPairs.length >= 30) break
+            }
+          }
+          if (infoPairs.length >= 30) break
+        }
+        if (infoPairs.length > 0) {
+          if (!makerWrap) {
+            makerWrap = document.createElement('div')
+            makerWrap.className = 'makernote'
+            const title = document.createElement('div')
+            title.className = 'title'
+            title.textContent = t('makerNote')
+            makerWrap.appendChild(title)
+          }
+          const table = document.createElement('div')
+          table.className = 'info-table'
+          for (const [k, v] of infoPairs) {
+            const kk = document.createElement('div'); kk.className = 'key'; kk.textContent = k
+            const vv = document.createElement('div'); vv.className = 'val'; vv.textContent = v
+            table.appendChild(kk); table.appendChild(vv)
+          }
+          makerWrap.appendChild(table)
+        }
+        if (makerWrap) ui.article.querySelector('.card-body')?.appendChild(makerWrap)
+      } catch {}
+
       updateExportButtonsDisabledState()
 
     } catch (err) {
@@ -698,6 +987,7 @@
   // Export buttons
   if (exportJsonButton) exportJsonButton.addEventListener('click', exportAsJSON)
   if (exportCsvButton) exportCsvButton.addEventListener('click', exportAsCSV)
+  if (exportPdfButton) exportPdfButton.addEventListener('click', exportAsPDF)
   updateExportButtonsDisabledState()
 
   // Clear results

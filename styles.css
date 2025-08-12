@@ -25,7 +25,7 @@ body{
 .dropzone{
   border:2px dashed var(--border); border-radius:14px; padding:28px; text-align:center;
   background:linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01));
-  transition: all .18s ease; outline:none;
+  transition: all .18s ease; outline:none; position:relative;
 }
 .dropzone:hover, .dropzone:focus{border-color:var(--accent); box-shadow:0 0 0 4px rgba(79,140,255,.15)}
 .dropzone.is-dragover{border-color:var(--accent); background:rgba(79,140,255,.06)}
@@ -35,8 +35,15 @@ body{
 .browse-button{display:inline-block; background:var(--accent); color:#fff; padding:10px 14px; border-radius:10px; cursor:pointer}
 .browse-button:hover{background:var(--accent-2)}
 .dz-hint{margin:10px 0 0; color:var(--muted)}
+/* 新增：拖曳區圖示與自動提示 */
+.dz-icon{display:flex;justify-content:center;margin-bottom:8px;color:var(--muted)}
+/* 自動提示：預設隱藏，拖曳/聚焦時顯示 */
+.dz-tooltip{display:none;position:absolute;left:50%;transform:translateX(-50%);top:100%;margin-top:8px;background:#0b1326;color:var(--text);border:1px solid var(--border);padding:10px 12px;border-radius:10px;box-shadow:0 10px 30px rgba(0,0,0,.45);max-width:min(520px, 92%);text-align:center;z-index:10}
+.dropzone.is-dragover .dz-tooltip,
+.dropzone:focus .dz-tooltip{display:block}
 
 .toolbar{display:flex; gap:12px; margin-top:14px; align-items:center; flex-wrap:wrap}
+.toolbar-sep{width:1px;height:28px;background:var(--border);margin:0 6px}
 .btn{
   appearance:none; border:1px solid var(--border); background:#0e1629; color:var(--text);
   padding:8px 12px; border-radius:10px; cursor:pointer; transition:.15s ease all;
@@ -45,6 +52,9 @@ body{
 .btn:disabled{opacity:.5; cursor:not-allowed}
 .btn.primary{background:var(--accent); border-color:var(--accent); color:#fff}
 .btn.danger{background:#2a0c11; border-color:#461217; color:#ffd7db}
+/* 清除結果按鈕更醒目 */
+#clear-button{background:#2a0c11;border-color:#4a0f16;color:#ffd7db}
+#clear-button:hover{background:#3a1117;border-color:#61161e}
 
 /* GitHub repo button */
 .btn.github-btn{display:inline-flex;align-items:center;gap:8px;text-decoration:none}
@@ -99,6 +109,40 @@ pre.json{max-height:240px; overflow:auto; background:#0b1326; border:1px solid v
 /* 新增：徽章顏色語意 */
 .badge.success{border-color:rgba(15,185,129,.35); color:#c1f2e2; background:rgba(15,185,129,.08)}
 .badge.danger{border-color:rgba(229,72,77,.35); color:#ffd9db; background:rgba(229,72,77,.08)}
+
+/* 新增：可疑欄位標示 */
+.kv .val.is-suspect{color:#ffd9db}
+.kv .key.is-suspect{color:#ff9aa0}
+
+/* 新增：表格類資訊（RAW、Hash、MakerNote）*/
+.info-table{display:grid;grid-template-columns:160px 1fr;gap:6px 10px;margin-top:6px;font-size:13px}
+.info-table .key{color:var(--muted)}
+.info-table .val{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+/* 新增：MakerNote 區塊 */
+.makernote{margin-top:6px;background:#0b1326;border:1px dashed var(--border);border-radius:10px;padding:8px}
+.makernote .title{font-size:14px;margin:0 0 6px 0;color:var(--muted)}
+.makernote pre{margin:0;max-height:200px;overflow:auto}
+
+/* ===== PDF 報告樣式（離屏渲染） ===== */
+.pdf-report-root{position:fixed;left:-200vw;top:0;opacity:0.01;pointer-events:none;z-index:-1}
+.pdf-page{width:794px;height:1123px;background:#ffffff;color:#1f2937;border:1px solid #e5e7eb;border-radius:8px;padding:32px 36px;display:flex;flex-direction:column;font:14px/1.6 system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,'Noto Sans TC','PingFang TC','Microsoft JhengHei',sans-serif}
+.pdf-header{display:flex;align-items:center;justify-content:space-between;padding-bottom:10px;border-bottom:2px solid #4f8cff;margin-bottom:18px}
+.pdf-title{font-size:20px;font-weight:800;letter-spacing:.2px}
+.pdf-meta{font-size:12px;color:#6b7280}
+.pdf-body{display:grid;grid-template-columns:260px 1fr;gap:16px}
+.pdf-thumb{width:100%;aspect-ratio:1/1;object-fit:cover;border-radius:10px;border:1px solid #e5e7eb;background:#f3f6ff}
+.pdf-fileinfo{margin-top:8px;font-size:12px;color:#6b7280}
+.pdf-badge{display:inline-block;padding:2px 10px;border-radius:999px;font-size:12px;border:1px solid #c7eadb;background:#e8fbf3;color:#0b7f5f}
+.pdf-badge.danger{border-color:#ffd0d3;background:#fff1f2;color:#b91c1c}
+.pdf-section{margin-top:10px}
+.pdf-section-title{font-weight:700;margin:0 0 6px 0;color:#111827;border-left:4px solid #4f8cff;padding-left:8px}
+.pdf-table{display:grid;grid-template-columns:160px 1fr;gap:8px 12px;font-size:13px}
+.pdf-table .key{color:#6b7280}
+.pdf-table .val{color:#1f2937;word-break:break-all}
+.pdf-footer{margin-top:auto;text-align:right;font-size:11px;color:#9ca3af}
+
+/* ===== END PDF 報告樣式 ===== */
 
 @media (max-width: 720px){
   .card{flex-direction:column}
