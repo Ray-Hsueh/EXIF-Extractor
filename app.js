@@ -111,6 +111,62 @@
       hashMD5: 'MD5', hashSHA256: 'SHA-256',
       digitalSignature: 'Firma digital', signaturePresent: 'Presente', signatureAbsent: 'No detectado',
       exportPDF: 'Exportar PDF',
+    },
+    'fr': {
+      title: 'Extracteur EXIF',
+      subtitle: 'Toutes les analyses sont effectuées localement. Aucune photo n’est envoyée.',
+      dropTitle: 'Glissez des photos ici',
+      or: 'ou',
+      chooseFiles: 'Choisir des fichiers',
+      hint: 'Prend en charge JPG, PNG, HEIC, AVIF, TIFF, NEF… Fichier unique recommandé ≤ 50 Mo.',
+      clear: 'Effacer les résultats',
+      exifrLoadFail: "Échec du chargement d'exifr. Vérifiez votre réseau et réessayez.",
+      statusNoExif: 'Aucune donnée EXIF trouvée',
+      camera: 'Appareil photo', lens: 'Objectif', time: 'Heure', iso: 'ISO', aperture: 'Ouverture', shutter: 'Vitesse', focal: 'Distance focale', gps: 'GPS', error: 'Erreur',
+      map: 'Ouvrir dans Google Maps',
+      copy: 'Copier le JSON', copied: 'Copié !', copyFail: 'Échec de la copie', jsonSummary: 'Voir le JSON complet',
+      ariaDropzone: 'Glissez-déposez ou cliquez pour importer des photos',
+      analyzeUrl: 'Analyser l’URL', pasteImage: 'Coller l’image', urlPlaceholder: 'Coller l’URL de l’image',
+      urlEmpty: 'Veuillez entrer une URL d’image', urlFetchFail: 'Échec du chargement de l’image. Le serveur peut bloquer CORS.',
+      pasteNotAllowed: 'Accès au presse‑papiers refusé ou non pris en charge.',
+      exportJSON: 'Exporter le JSON', exportCSV: 'Exporter le CSV',
+      edited: 'Modifié',
+      original: 'Original',
+      noExifShort: 'Sans EXIF',
+      software: 'Logiciel',
+      rawInfo: 'Détails RAW', bitDepth: 'Profondeur de bits', compression: 'Compression', whiteBalance: 'Balance des blancs',
+      makerNote: 'MakerNote',
+      hashMD5: 'MD5', hashSHA256: 'SHA-256',
+      digitalSignature: 'Signature numérique', signaturePresent: 'Présente', signatureAbsent: 'Non détectée',
+      exportPDF: 'Exporter en PDF',
+    },
+    'ar': {
+      title: 'مستخرج EXIF',
+      subtitle: 'تتم جميع المعالجة محليًا. لا يتم رفع أي صور.',
+      dropTitle: 'اسحب الصور هنا',
+      or: 'أو',
+      chooseFiles: 'اختر الملفات',
+      hint: 'يدعم JPG وPNG وHEIC وAVIF وTIFF وNEF… يُنصح بأن يكون حجم الملف الواحد ≤ 50 ميجابايت.',
+      clear: 'مسح النتائج',
+      exifrLoadFail: 'فشل تحميل exifr. يرجى التحقق من الشبكة والمحاولة مرة أخرى.',
+      statusNoExif: 'لا توجد بيانات EXIF',
+      camera: 'الكاميرا', lens: 'العدسة', time: 'الوقت', iso: 'ISO', aperture: 'فتحة العدسة', shutter: 'سرعة الغالق', focal: 'البعد البؤري', gps: 'GPS', error: 'خطأ',
+      map: 'افتح في خرائط Google',
+      copy: 'نسخ JSON', copied: 'تم النسخ!', copyFail: 'فشل النسخ', jsonSummary: 'عرض JSON الكامل',
+      ariaDropzone: 'اسحب وأفلت أو انقر لرفع الصور',
+      analyzeUrl: 'تحليل الرابط', pasteImage: 'لصق الصورة', urlPlaceholder: 'ألصق رابط الصورة',
+      urlEmpty: 'يرجى إدخال رابط صورة', urlFetchFail: 'فشل جلب الصورة. قد يمنع الخادم CORS.',
+      pasteNotAllowed: 'الوصول إلى الحافظة مرفوض أو غير مدعوم.',
+      exportJSON: 'تصدير JSON', exportCSV: 'تصدير CSV',
+      edited: 'معدّل',
+      original: 'أصلي',
+      noExifShort: 'بدون EXIF',
+      software: 'البرنامج',
+      rawInfo: 'تفاصيل RAW', bitDepth: 'عمق البت', compression: 'الضغط', whiteBalance: 'توازن اللون الأبيض',
+      makerNote: 'MakerNote',
+      hashMD5: 'MD5', hashSHA256: 'SHA-256',
+      digitalSignature: 'التوقيع الرقمي', signaturePresent: 'موجود', signatureAbsent: 'غير موجود',
+      exportPDF: 'تصدير PDF',
     }
   }
   let currentLang = 'en'
@@ -128,11 +184,21 @@
     }
     if (clearButtonElement) clearButtonElement.textContent = t('clear')
     // button shows the NEXT language to switch to
-    const nextLang = currentLang === 'en' ? 'zh-Hant' : (currentLang === 'zh-Hant' ? 'es' : 'en')
-    if (langToggleButton) langToggleButton.textContent = (nextLang === 'zh-Hant' ? '中文' : (nextLang === 'es' ? 'ES' : 'EN'))
+    const seq = ['en','zh-Hant','es','fr','ar']
+    const nextLang = seq[(Math.max(0, seq.indexOf(currentLang)) + 1) % seq.length]
+    if (langToggleButton) {
+      langToggleButton.textContent = (
+        nextLang === 'zh-Hant' ? '中文' :
+        nextLang === 'es' ? 'ES' :
+        nextLang === 'fr' ? 'FR' :
+        nextLang === 'ar' ? 'AR' :
+        'EN'
+      )
+    }
     if (dropzoneElement) dropzoneElement.setAttribute('aria-label', t('ariaDropzone'))
     // reflect current lang on <html>
     try { document.documentElement.lang = currentLang } catch {}
+    try { document.documentElement.dir = (currentLang === 'ar' ? 'rtl' : 'ltr') } catch {}
 
     // URL/Paste/Export controls text
     if (analyzeUrlButton) analyzeUrlButton.textContent = t('analyzeUrl')
@@ -150,7 +216,9 @@
 
   if (langToggleButton) {
     langToggleButton.addEventListener('click', () => {
-      currentLang = currentLang === 'en' ? 'zh-Hant' : (currentLang === 'zh-Hant' ? 'es' : 'en')
+      const seq = ['en','zh-Hant','es','fr','ar']
+      const nextLang = seq[(Math.max(0, seq.indexOf(currentLang)) + 1) % seq.length]
+      currentLang = nextLang
       applyStaticTexts()
       // 重新渲染目前結果卡片的欄位名稱
       rerenderAllCardsLabels()
@@ -199,9 +267,9 @@
   function formatDate(value) {
     try {
       if (!value) return ''
-      if (value instanceof Date) return value.toLocaleString()
+      if (value instanceof Date) return value.toLocaleString(currentLang)
       const d = new Date(value)
-      return Number.isNaN(d.getTime()) ? String(value) : d.toLocaleString()
+      return Number.isNaN(d.getTime()) ? String(value) : d.toLocaleString(currentLang)
     } catch { return String(value ?? '') }
   }
 
@@ -348,7 +416,13 @@
     const dzBusy = document.getElementById('dz-busy')
     const dzBusyText = document.getElementById('dz-busy-text')
     if (dzBusy) dzBusy.setAttribute('aria-hidden', busy ? 'false' : 'true')
-    if (dzBusyText) dzBusyText.textContent = (currentLang === 'en' ? 'Processing…' : (currentLang === 'zh-Hant' ? '處理中…' : 'Procesando…'))
+    if (dzBusyText) dzBusyText.textContent = (
+      currentLang === 'en' ? 'Processing…' :
+      currentLang === 'zh-Hant' ? '處理中…' :
+      currentLang === 'es' ? 'Procesando…' :
+      currentLang === 'fr' ? 'Traitement…' :
+      'جارٍ المعالجة…'
+    )
   }
 
   function addKV(kv, key, value) {
@@ -367,16 +441,22 @@
   function rerenderAllCardsLabels() {
     const keyMap = new Map([
       ['Camera', 'camera'], ['相機', 'camera'], ['Cámara', 'camera'],
+      ['Appareil photo', 'camera'], ['Caméra', 'camera'], ['الكاميرا', 'camera'],
       ['Lens', 'lens'], ['鏡頭', 'lens'], ['Objetivo', 'lens'],
+      ['Objectif', 'lens'], ['العدسة', 'lens'],
       ['Time', 'time'], ['時間', 'time'], ['Hora', 'time'],
+      ['Heure', 'time'], ['الوقت', 'time'],
       ['ISO', 'iso'],
       ['Aperture', 'aperture'], ['光圈', 'aperture'], ['Apertura', 'aperture'],
+      ['Ouverture', 'aperture'], ['فتحة العدسة', 'aperture'],
       ['Shutter', 'shutter'], ['快門', 'shutter'], ['Obturación', 'shutter'],
+      ['Vitesse', 'shutter'], ['سرعة الغالق', 'shutter'],
       ['Focal length', 'focal'], ['焦距', 'focal'], ['Longitud focal', 'focal'],
+      ['Distance focale', 'focal'], ['البعد البؤري', 'focal'],
       ['GPS', 'gps'],
-      ['Error', 'error'], ['錯誤', 'error'], ['Error', 'error'],
-      ['Status', 'status'], ['狀態', 'status'], ['Estado', 'status'],
-      ['Software', 'software'], ['軟體', 'software'], ['Software', 'software'],
+      ['Error', 'error'], ['錯誤', 'error'], ['Error', 'error'], ['Erreur', 'error'], ['خطأ', 'error'],
+      ['Status', 'status'], ['狀態', 'status'], ['Estado', 'status'], ['Statut', 'status'], ['الحالة', 'status'],
+      ['Software', 'software'], ['軟體', 'software'], ['Software', 'software'], ['Logiciel', 'software'], ['البرنامج', 'software'],
     ])
     resultsElement.querySelectorAll('.card .kv .key').forEach(el => {
       const key = keyMap.get(el.textContent) || el.textContent
@@ -390,7 +470,13 @@
         case 'focal': el.textContent = t('focal'); break
         case 'gps': el.textContent = t('gps'); break
         case 'error': el.textContent = t('error'); break
-        case 'status': el.textContent = (currentLang === 'en' ? 'Status' : (currentLang === 'zh-Hant' ? '狀態' : 'Estado')); break
+        case 'status': el.textContent = (
+          currentLang === 'en' ? 'Status' :
+          currentLang === 'zh-Hant' ? '狀態' :
+          currentLang === 'es' ? 'Estado' :
+          currentLang === 'fr' ? 'Statut' :
+          'الحالة'
+        ); break
         case 'software': el.textContent = t('software'); break
         default: break
       }
@@ -554,8 +640,8 @@
         // 建立漂亮頁面 DOM
         const page = mk('div','pdf-page')
         const header = mk('div','pdf-header')
-        header.appendChild(mk('div','pdf-title','EXIF Report'))
-        const meta = mk('div','pdf-meta', new Date().toLocaleString())
+        header.appendChild(mk('div','pdf-title', t('title')))
+        const meta = mk('div','pdf-meta', new Date().toLocaleString(currentLang))
         header.appendChild(meta)
         page.appendChild(header)
 
@@ -666,7 +752,15 @@
         badge.setAttribute('data-status', 'no-exif')
         badge.textContent = t('noExifShort')
         ui.statusEl.appendChild(badge)
-        addKV(ui.kv, currentLang === 'en' ? 'Status' : (currentLang === 'zh-Hant' ? '狀態' : 'Estado'), t('statusNoExif'))
+        addKV(
+          ui.kv,
+          currentLang === 'en' ? 'Status' :
+          currentLang === 'zh-Hant' ? '狀態' :
+          currentLang === 'es' ? 'Estado' :
+          currentLang === 'fr' ? 'Statut' :
+          'الحالة',
+          t('statusNoExif')
+        )
         return
       }
 

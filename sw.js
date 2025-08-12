@@ -1,5 +1,5 @@
 'use strict'
-const CACHE_NAME = 'exif-extractor-v1'
+const CACHE_NAME = 'exif-extractor-v2'
 const CORE_ASSETS = [
   '/',
   '/index.html',
@@ -28,19 +28,33 @@ self.addEventListener('fetch', event => {
   const req = event.request
 
   if (req.method !== 'GET') return
+  // Network-first for HTML to avoid stale UI
+  const isHtml = req.mode === 'navigate' || req.destination === 'document' || (req.headers.get('accept') || '').includes('text/html')
+  if (isHtml) {
+    event.respondWith((async () => {
+      try {
+        const resp = await fetch(req)
+        const cache = await caches.open(CACHE_NAME)
+        cache.put(req, resp.clone())
+        return resp
+      } catch {
+        const cache = await caches.open(CACHE_NAME)
+        return (await cache.match(req)) || (await cache.match('/index.html')) || (await cache.match('/')) || new Response('Offline', { status: 503, statusText: 'Offline' })
+      }
+    })())
+    return
+  }
+
+  // Cache-first for other GET requests
   event.respondWith((async () => {
     const cache = await caches.open(CACHE_NAME)
     const cached = await cache.match(req)
     if (cached) return cached
     try {
       const resp = await fetch(req)
-
-      if (req.url.startsWith(self.location.origin)) {
-        cache.put(req, resp.clone())
-      }
+      if (req.url.startsWith(self.location.origin)) cache.put(req, resp.clone())
       return resp
     } catch {
-
       const fallback = await cache.match('/')
       return fallback || new Response('Offline', { status: 503, statusText: 'Offline' })
     }
