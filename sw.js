@@ -1,11 +1,14 @@
 'use strict'
-const CACHE_NAME = 'exif-extractor-v2'
+const CACHE_NAME = 'exif-extractor-v3'
 const CORE_ASSETS = [
   '/',
   '/index.html',
   '/styles.css',
   '/app.js',
   '/favicon.svg',
+  '/manifest.webmanifest',
+  '/icons/icon-192.png',
+  '/icons/icon-512.png',
 ]
 
 self.addEventListener('install', event => {
@@ -45,16 +48,16 @@ self.addEventListener('fetch', event => {
     return
   }
 
-  // Cache-first for other GET requests
+  // Network-first for other same-origin GET requests (scripts, styles, images, manifest, etc.)
   event.respondWith((async () => {
     const cache = await caches.open(CACHE_NAME)
-    const cached = await cache.match(req)
-    if (cached) return cached
     try {
       const resp = await fetch(req)
       if (req.url.startsWith(self.location.origin)) cache.put(req, resp.clone())
       return resp
     } catch {
+      const cached = await cache.match(req)
+      if (cached) return cached
       const fallback = await cache.match('/')
       return fallback || new Response('Offline', { status: 503, statusText: 'Offline' })
     }
