@@ -1029,6 +1029,7 @@
         mapLink.rel = 'noopener'
         mapLink.textContent = t('map')
         mapLink.dataset.action = 'map'
+        mapLink.style.minWidth = 'fit-content'
         ui.actions.appendChild(mapLink)
         addKV(ui.kv, t('gps'), `${latNum.toFixed(6)}, ${lonNum.toFixed(6)}`)
         ui.article.dataset.hasGps = 'true'
@@ -1043,6 +1044,7 @@
       copyBtn.className = 'btn'
       copyBtn.textContent = t('copy')
       copyBtn.dataset.action = 'copy-json'
+      copyBtn.style.minWidth = 'fit-content'
       copyBtn.addEventListener('click', async () => {
         try {
           const payload2 = { exifr: toSerializableTrimmed(exifrResult), exifreader: toSerializableTrimmed(fallback) }
@@ -1080,6 +1082,7 @@
       copyMainBtn.className = 'btn'
       copyMainBtn.textContent = t('copyMain')
       copyMainBtn.dataset.action = 'copy-main'
+      copyMainBtn.style.minWidth = 'fit-content'
       copyMainBtn.addEventListener('click', async () => {
         try { await navigator.clipboard.writeText(JSON.stringify(summary, null, 2)); copyMainBtn.textContent = t('copied'); setTimeout(() => (copyMainBtn.textContent = t('copyMain')), 1200) }
         catch { copyMainBtn.textContent = t('copyFail'); setTimeout(() => (copyMainBtn.textContent = t('copyMain')), 1200) }
