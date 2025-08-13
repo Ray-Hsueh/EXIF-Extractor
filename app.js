@@ -129,7 +129,7 @@
     },
     'fr': {
       title: 'Extracteur EXIF',
-      subtitle: 'Toutes les analyses sont effectuées localement. Aucune photo n’est envoyée.',
+      subtitle: 'Toutes les analyses sont effectuées localement. Aucune photo n\'est envoyée.',
       dropTitle: 'Glissez des photos ici',
       or: 'ou',
       chooseFiles: 'Choisir des fichiers',
@@ -141,8 +141,8 @@
       map: 'Ouvrir dans Google Maps',
       copy: 'Copier le JSON', copied: 'Copié !', copyFail: 'Échec de la copie', jsonSummary: 'Voir le JSON complet',
       ariaDropzone: 'Glissez-déposez ou cliquez pour importer des photos',
-      analyzeUrl: 'Analyser l’URL', pasteImage: 'Coller l’image', urlPlaceholder: 'Coller l’URL de l’image',
-      urlEmpty: 'Veuillez entrer une URL d’image', urlFetchFail: 'Échec du chargement de l’image. Le serveur peut bloquer CORS.',
+      analyzeUrl: 'Analyser l\'URL', pasteImage: 'Coller l\'image', urlPlaceholder: 'Coller l\'URL de l\'image',
+      urlEmpty: 'Veuillez entrer une URL d\'image', urlFetchFail: 'Échec du chargement de l\'image. Le serveur peut bloquer CORS.',
       pasteNotAllowed: 'Accès au presse‑papiers refusé ou non pris en charge.',
       exportJSON: 'Exporter le JSON', exportCSV: 'Exporter le CSV',
       edited: 'Modifié',
@@ -259,6 +259,39 @@
       copyCoords: 'کو آرڈینیٹس نقل کریں',
       copyMain: 'خلاصہ نقل کریں',
     },
+    'ja': {
+      title: 'EXIF エクストラクター',
+      subtitle: '解析はすべてローカルで実行され、写真はアップロードされません。',
+      dropTitle: 'ここに写真をドラッグ',
+      or: 'または',
+      chooseFiles: 'ファイルを選択',
+      hint: 'JPG、PNG、HEIC、AVIF、TIFF、NEF… に対応。推奨: 単一ファイル ≤ 50MB。',
+      clear: '結果をクリア',
+      exifrLoadFail: 'exifr の読み込みに失敗しました。ネットワークを確認して再試行してください。',
+      statusNoExif: 'EXIF データが見つかりません',
+      camera: 'カメラ', lens: 'レンズ', time: '時刻', iso: 'ISO', aperture: '絞り', shutter: 'シャッター', focal: '焦点距離', gps: 'GPS', error: 'エラー',
+      map: 'Google マップで開く',
+      copy: 'JSON をコピー', copied: 'コピーしました', copyFail: 'コピーに失敗', jsonSummary: 'JSON を表示',
+      ariaDropzone: 'ドラッグ＆ドロップ、またはクリックして写真をアップロード',
+      analyzeUrl: 'URL を解析', pasteImage: '画像を貼り付け', urlPlaceholder: '画像の URL を貼り付け',
+      urlEmpty: '画像 URL を入力してください', urlFetchFail: '画像の取得に失敗しました。サーバーが CORS をブロックしている可能性があります。',
+      pasteNotAllowed: 'クリップボード画像へのアクセスが拒否された、または未対応です。',
+      exportJSON: 'JSON を出力', exportCSV: 'CSV を出力',
+      edited: '編集済み',
+      original: 'オリジナル',
+      noExifShort: 'EXIF なし',
+      software: 'ソフトウェア',
+      rawInfo: 'RAW 詳細', bitDepth: 'ビット深度', compression: '圧縮方式', whiteBalance: 'ホワイトバランス',
+      makerNote: 'MakerNote',
+      hashMD5: 'MD5', hashSHA256: 'SHA-256',
+      digitalSignature: 'デジタル署名', signaturePresent: 'あり', signatureAbsent: 'なし',
+      exportPDF: 'PDF を出力',
+      expandAll: 'すべて展開',
+      collapseAll: 'すべて折りたたむ',
+      removeCard: 'カードを削除',
+      copyCoords: '座標をコピー',
+      copyMain: '概要をコピー',
+    },
   }
   let currentLang = detectPreferredLang()
   const parsedResults = []
@@ -278,6 +311,7 @@
       if (s.startsWith('ar')) return 'ar'
       if (s.startsWith('hi')) return 'hi'
       if (s.startsWith('ur')) return 'ur'
+      if (s.startsWith('ja')) return 'ja'
       if (s.startsWith('en')) return 'en'
     }
     return 'en'
@@ -297,7 +331,7 @@
     }
     if (clearButtonElement) clearButtonElement.textContent = t('clear')
     // button shows the NEXT language to switch to
-    const seq = ['en','zh-Hant','es','fr','ar','hi','ur']
+    const seq = ['en','zh-Hant','es','fr','ar','hi','ur','ja']
     const nextLang = seq[(Math.max(0, seq.indexOf(currentLang)) + 1) % seq.length]
     if (langToggleButton) {
       langToggleButton.textContent = (
@@ -307,6 +341,7 @@
         nextLang === 'ar' ? 'العربية' :
         nextLang === 'hi' ? 'हिन्दी' :
         nextLang === 'ur' ? 'اردو' :
+        nextLang === 'ja' ? '日本語' :
         'EN'
       )
     }
@@ -340,7 +375,7 @@
 
   if (langToggleButton) {
     langToggleButton.addEventListener('click', () => {
-      const seq = ['en','zh-Hant','es','fr','ar','hi','ur']
+      const seq = ['en','zh-Hant','es','fr','ar','hi','ur','ja']
       const nextLang = seq[(Math.max(0, seq.indexOf(currentLang)) + 1) % seq.length]
       currentLang = nextLang
       applyStaticTexts()
@@ -724,6 +759,7 @@
       if (currentLang === 'ar') return `تم التحليل ${n} | يحتوي على GPS ${gps} | معدَّلة ${edited}`
       if (currentLang === 'hi') return `अनुसरण किया ${n} | GPS ${gps} | संशोधित ${edited}`
       if (currentLang === 'ur') return `تحلیل کیا ہے ${n} | GPS ${gps} | ترمیم شدہ ${edited}`
+      if (currentLang === 'ja') return `解析済み ${n} 件｜GPS あり ${gps} 件｜編集と判定 ${edited} 件`
       return `Parsed ${n} | GPS ${gps} | Edited ${edited}`
     } catch {
       return `Parsed ${n} | GPS ${gps} | Edited ${edited}`
