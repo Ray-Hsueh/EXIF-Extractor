@@ -63,6 +63,9 @@ body{
 /* GitHub repo button */
 .btn.github-btn{display:inline-flex;align-items:center;gap:8px;text-decoration:none}
 .btn.github-btn svg{width:18px;height:18px;fill:currentColor;display:block}
+/* Map button variant */
+.btn.btn-map{background:#0b213a;border-color:#1e3a6f;color:#cfe2ff}
+.btn.btn-map:hover{border-color:#4f8cff;background:#0d2950}
 
 /* Segmented control for language */
 .segmented{display:inline-flex;align-items:stretch;border:1px solid var(--border);border-radius:10px;overflow:hidden;background:#0e1629}
@@ -78,6 +81,9 @@ body{
   background:var(--card); border:1px solid var(--border); border-radius:14px; overflow:hidden;
   display:flex; flex-direction:row; min-height:220px
 }
+.card{position:relative}
+.card .card-close{position:absolute;top:8px;right:8px;width:28px;height:28px;line-height:28px;text-align:center;border-radius:50%;border:1px solid var(--border);background:#0e1629;color:var(--muted);cursor:pointer}
+.card .card-close:hover{color:#fff;border-color:#4f8cff}
 .card-header{display:flex; flex-direction:column; align-items:flex-start; gap:12px; padding:16px; border-right:1px solid var(--border); min-width:240px}
 .file-thumb{width:160px;height:160px;border-radius:10px;object-fit:cover;background:#0c1427;border:1px solid var(--border)}
 .file-meta{display:flex; flex-direction:column; gap:2px; min-width:0}

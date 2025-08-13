@@ -29,7 +29,7 @@
       or: 'or',
       chooseFiles: 'Choose files',
       hint: 'Supports JPG, PNG, HEIC, AVIF, TIFF, NEF… Recommended single file ≤ 50MB.',
-      clear: 'Clear results',
+      clear: 'Clear all',
       exifrLoadFail: 'Failed to load exifr. Please check your network and retry.',
       statusNoExif: 'No EXIF data found',
       camera: 'Camera', lens: 'Lens', time: 'Time', iso: 'ISO', aperture: 'Aperture', shutter: 'Shutter', focal: 'Focal length', gps: 'GPS', error: 'Error',
@@ -54,7 +54,6 @@
       expandAll: 'Expand all',
       collapseAll: 'Collapse all',
       removeCard: 'Remove card',
-      copyCoords: 'Copy coords',
       copyMain: 'Copy summary',
     },
     'zh-Hant': {
@@ -64,7 +63,7 @@
       or: '或',
       chooseFiles: '點擊選取檔案',
       hint: '支援 JPG、PNG、HEIC、AVIF、TIFF、NEF… 建議單檔 ≤ 50MB。',
-      clear: '清除結果',
+      clear: '清除全部',
       exifrLoadFail: 'exifr 載入失敗，請檢查網路或稍後再試。',
       statusNoExif: '找不到 EXIF 資料',
       camera: '相機', lens: '鏡頭', time: '時間', iso: 'ISO', aperture: '光圈', shutter: '快門', focal: '焦距', gps: 'GPS', error: '錯誤',
@@ -88,8 +87,7 @@
       exportPDF: '匯出 PDF',
       expandAll: '全部展開',
       collapseAll: '全部收起',
-      removeCard: '刪除卡片',
-      copyCoords: '複製座標',
+      removeCard: '移除此卡',
       copyMain: '複製主要欄位',
     },
     'es': {
@@ -99,7 +97,7 @@
       or: 'o',
       chooseFiles: 'Elegir archivos',
       hint: 'Compatible con JPG, PNG, HEIC, AVIF, TIFF, NEF… Se recomienda archivo individual ≤ 50 MB.',
-      clear: 'Limpiar resultados',
+      clear: 'Limpiar todo',
       exifrLoadFail: 'No se pudo cargar exifr. Verifica tu red e inténtalo de nuevo.',
       statusNoExif: 'No se encontraron datos EXIF',
       camera: 'Cámara', lens: 'Objetivo', time: 'Hora', iso: 'ISO', aperture: 'Apertura', shutter: 'Obturación', focal: 'Longitud focal', gps: 'GPS', error: 'Error',
@@ -124,7 +122,6 @@
       expandAll: 'Expandir todo',
       collapseAll: 'Contraer todo',
       removeCard: 'Eliminar tarjeta',
-      copyCoords: 'Copiar coordenadas',
       copyMain: 'Copiar resumen',
     },
     'fr': {
@@ -134,7 +131,7 @@
       or: 'ou',
       chooseFiles: 'Choisir des fichiers',
       hint: 'Prend en charge JPG, PNG, HEIC, AVIF, TIFF, NEF… Fichier unique recommandé ≤ 50 Mo.',
-      clear: 'Effacer les résultats',
+      clear: 'Tout effacer',
       exifrLoadFail: "Échec du chargement d'exifr. Vérifiez votre réseau et réessayez.",
       statusNoExif: 'Aucune donnée EXIF trouvée',
       camera: 'Appareil photo', lens: 'Objectif', time: 'Heure', iso: 'ISO', aperture: 'Ouverture', shutter: 'Vitesse', focal: 'Distance focale', gps: 'GPS', error: 'Erreur',
@@ -157,7 +154,6 @@
       expandAll: 'Tout développer',
       collapseAll: 'Tout réduire',
       removeCard: 'Supprimer la carte',
-      copyCoords: 'Copier les coordonnées',
       copyMain: 'Copier le résumé',
     },
     'ar': {
@@ -167,7 +163,7 @@
       or: 'أو',
       chooseFiles: 'اختر الملفات',
       hint: 'يدعم JPG وPNG وHEIC وAVIF وTIFF وNEF… يُنصح بأن يكون حجم الملف الواحد ≤ 50 ميجابايت.',
-      clear: 'مسح النتائج',
+      clear: 'مسح الكل',
       exifrLoadFail: 'فشل تحميل exifr. يرجى التحقق من الشبكة والمحاولة مرة أخرى.',
       statusNoExif: 'لا توجد بيانات EXIF',
       camera: 'الكاميرا', lens: 'العدسة', time: 'الوقت', iso: 'ISO', aperture: 'فتحة العدسة', shutter: 'سرعة الغالق', focal: 'البعد البؤري', gps: 'GPS', error: 'خطأ',
@@ -190,7 +186,6 @@
       expandAll: 'توسيع الكل',
       collapseAll: 'طي الكل',
       removeCard: 'إزالة البطاقة',
-      copyCoords: 'نسخ الإحداثيات',
       copyMain: 'نسخ الملخص',
     },
     'hi': {
@@ -200,7 +195,7 @@
       or: 'या',
       chooseFiles: 'फ़ाइलें चुनें',
       hint: 'JPG, PNG, HEIC, AVIF, TIFF, NEF… समर्थित। एकल फ़ाइल ≤ 50MB सुझाव।',
-      clear: 'परिणाम साफ़ करें',
+      clear: 'सब साफ़ करें',
       exifrLoadFail: 'exifr लोड विफल। कृपया नेटवर्क जाँचें और पुनः प्रयास करें।',
       statusNoExif: 'EXIF डेटा नहीं मिला',
       camera: 'कैमरा', lens: 'लेंस', time: 'समय', iso: 'ISO', aperture: 'एपर्चर', shutter: 'शटर', focal: 'फोकल लंबाई', gps: 'GPS', error: 'त्रुटि',
@@ -223,7 +218,6 @@
       expandAll: 'सभी फैलाएँ',
       collapseAll: 'सभी समेटें',
       removeCard: 'कार्ड हटाएँ',
-      copyCoords: 'निर्देशांक कॉपी करें',
       copyMain: 'सार कॉपी करें',
     },
     'ur': {
@@ -233,7 +227,7 @@
       or: 'یا',
       chooseFiles: 'فائلیں منتخب کریں',
       hint: 'JPG، PNG، HEIC، AVIF، TIFF، NEF… معاون۔ ایک فائل ≤ 50MB کی سفارش۔',
-      clear: 'نتائج صاف کریں',
+      clear: 'سب صاف کریں',
       exifrLoadFail: 'exifr لوڈ کرنے میں ناکامی۔ براہ کرم نیٹ ورک چیک کریں اور دوبارہ کوشش کریں۔',
       statusNoExif: 'EXIF ڈیٹا نہیں ملا',
       camera: 'کیمرہ', lens: 'لینس', time: 'وقت', iso: 'ISO', aperture: 'اپرچر', shutter: 'شٹر', focal: 'فوکل لمبائی', gps: 'GPS', error: 'خرابی',
@@ -256,7 +250,6 @@
       expandAll: 'سب پھیلا دیں',
       collapseAll: 'سب سمیٹ دیں',
       removeCard: 'کارڈ حذف کریں',
-      copyCoords: 'کو آرڈینیٹس نقل کریں',
       copyMain: 'خلاصہ نقل کریں',
     },
     'ja': {
@@ -266,7 +259,7 @@
       or: 'または',
       chooseFiles: 'ファイルを選択',
       hint: 'JPG、PNG、HEIC、AVIF、TIFF、NEF… に対応。推奨: 単一ファイル ≤ 50MB。',
-      clear: '結果をクリア',
+      clear: 'すべてクリア',
       exifrLoadFail: 'exifr の読み込みに失敗しました。ネットワークを確認して再試行してください。',
       statusNoExif: 'EXIF データが見つかりません',
       camera: 'カメラ', lens: 'レンズ', time: '時刻', iso: 'ISO', aperture: '絞り', shutter: 'シャッター', focal: '焦点距離', gps: 'GPS', error: 'エラー',
@@ -289,7 +282,6 @@
       expandAll: 'すべて展開',
       collapseAll: 'すべて折りたたむ',
       removeCard: 'カードを削除',
-      copyCoords: '座標をコピー',
       copyMain: '概要をコピー',
     },
   }
@@ -506,6 +498,13 @@
     const article = document.createElement('article')
     article.className = 'card'
 
+    const closeBtn = document.createElement('button')
+    closeBtn.className = 'card-close'
+    closeBtn.type = 'button'
+    closeBtn.setAttribute('aria-label', t('removeCard'))
+    closeBtn.textContent = '×'
+    article.appendChild(closeBtn)
+
     const header = document.createElement('div')
     header.className = 'card-header'
 
@@ -570,7 +569,7 @@
     article.appendChild(header)
     article.appendChild(body)
 
-    return { article, header, img, meta, kv, actions, jsonPre, statusEl }
+    return { article, header, img, meta, kv, actions, jsonPre, statusEl, closeBtn }
   }
 
   function setDropzoneBusy(isBusy) {
@@ -651,10 +650,10 @@
       if (act === 'map') btn.textContent = t('map')
       else if (act === 'copy-json') btn.textContent = t('copy')
       else if (act === 'copy-main') btn.textContent = t('copyMain')
-      else if (act === 'copy-coords') btn.textContent = t('copyCoords')
-      else if (act === 'remove-card') btn.textContent = t('removeCard')
     })
     resultsElement.querySelectorAll('.json-block > summary').forEach(s => s.textContent = t('jsonSummary'))
+    // Update close button aria-label
+    resultsElement.querySelectorAll('.card .card-close').forEach(btn => btn.setAttribute('aria-label', t('removeCard')))
     // Update file status badge labels
     resultsElement.querySelectorAll('.file-status [data-status]')
       .forEach(s => {
@@ -914,19 +913,14 @@
     ui.article.dataset.id = itemId
     resultsElement.prepend(ui.article)
 
-    // Always provide remove button
-    const removeBtn = document.createElement('button')
-    removeBtn.className = 'btn danger'
-    removeBtn.textContent = t('removeCard')
-    removeBtn.dataset.action = 'remove-card'
-    removeBtn.addEventListener('click', () => {
+    // Bind remove (close) action on top-right cross button
+    ui.closeBtn.addEventListener('click', () => {
       ui.article.remove()
       const idx = parsedResults.findIndex(r => r.id === itemId)
       if (idx >= 0) parsedResults.splice(idx, 1)
       updateExportButtonsDisabledState()
       updateStats()
     })
-    ui.actions.appendChild(removeBtn)
 
     try {
       // Parse EXIF quickly, rotation, GPS, and file bytes in parallel
@@ -1029,7 +1023,7 @@
       const lonNum = Number(gps.longitude)
       if (Number.isFinite(latNum) && Number.isFinite(lonNum)) {
         const mapLink = document.createElement('a')
-        mapLink.className = 'btn'
+        mapLink.className = 'btn btn-map'
         mapLink.href = `https://www.google.com/maps/search/?api=1&query=${latNum},${lonNum}`
         mapLink.target = '_blank'
         mapLink.rel = 'noopener'
@@ -1040,15 +1034,6 @@
         ui.article.dataset.hasGps = 'true'
         ui.article.dataset.lat = String(latNum)
         ui.article.dataset.lon = String(lonNum)
-        const copyCoordsBtn = document.createElement('button')
-        copyCoordsBtn.className = 'btn'
-        copyCoordsBtn.textContent = t('copyCoords')
-        copyCoordsBtn.dataset.action = 'copy-coords'
-        copyCoordsBtn.addEventListener('click', async () => {
-          try { await navigator.clipboard.writeText(`${latNum.toFixed(6)}, ${lonNum.toFixed(6)}`); copyCoordsBtn.textContent = t('copied'); setTimeout(() => (copyCoordsBtn.textContent = t('copyCoords')), 1200) }
-          catch { copyCoordsBtn.textContent = t('copyFail'); setTimeout(() => (copyCoordsBtn.textContent = t('copyCoords')), 1200) }
-        })
-        ui.actions.appendChild(copyCoordsBtn)
       } else {
         addKV(ui.kv, t('gps'), '—')
         ui.article.dataset.hasGps = 'false'
