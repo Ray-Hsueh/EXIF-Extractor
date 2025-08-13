@@ -192,7 +192,73 @@
       removeCard: 'إزالة البطاقة',
       copyCoords: 'نسخ الإحداثيات',
       copyMain: 'نسخ الملخص',
-    }
+    },
+    'hi': {
+      title: 'EXIF एक्सट्रैक्टर',
+      subtitle: 'सारी प्रोसेसिंग आपके ब्राउज़र में स्थानीय रूप से होती है। कोई फोटो अपलोड नहीं होती।',
+      dropTitle: 'फोटो यहाँ खींचें',
+      or: 'या',
+      chooseFiles: 'फ़ाइलें चुनें',
+      hint: 'JPG, PNG, HEIC, AVIF, TIFF, NEF… समर्थित। एकल फ़ाइल ≤ 50MB सुझाव।',
+      clear: 'परिणाम साफ़ करें',
+      exifrLoadFail: 'exifr लोड विफल। कृपया नेटवर्क जाँचें और पुनः प्रयास करें।',
+      statusNoExif: 'EXIF डेटा नहीं मिला',
+      camera: 'कैमरा', lens: 'लेंस', time: 'समय', iso: 'ISO', aperture: 'एपर्चर', shutter: 'शटर', focal: 'फोकल लंबाई', gps: 'GPS', error: 'त्रुटि',
+      map: 'Google Maps में खोलें',
+      copy: 'JSON कॉपी करें', copied: 'कॉपी हो गया!', copyFail: 'कॉपी विफल', jsonSummary: 'पूर्ण JSON देखें',
+      ariaDropzone: 'ड्रैग-एंड-ड्रॉप करें या क्लिक कर अपलोड करें',
+      analyzeUrl: 'URL विश्लेषण', pasteImage: 'चित्र चिपकाएँ', urlPlaceholder: 'चित्र URL चिपकाएँ',
+      urlEmpty: 'कृपया चित्र URL दर्ज करें', urlFetchFail: 'चित्र लाने में विफल। सर्वर CORS अवरोधित कर सकता है।',
+      pasteNotAllowed: 'क्लिपबोर्ड एक्सेस अस्वीकृत या असमर्थित।',
+      exportJSON: 'JSON निर्यात', exportCSV: 'CSV निर्यात',
+      edited: 'संशोधित',
+      original: 'मूल',
+      noExifShort: 'EXIF नहीं',
+      software: 'सॉफ्टवेयर',
+      rawInfo: 'RAW विवरण', bitDepth: 'बिट गहराई', compression: 'कंप्रेशन', whiteBalance: 'व्हाइट बैलेंस',
+      makerNote: 'MakerNote',
+      hashMD5: 'MD5', hashSHA256: 'SHA-256',
+      digitalSignature: 'डिजिटल हस्ताक्षर', signaturePresent: 'मौजूद', signatureAbsent: 'नहीं मिला',
+      exportPDF: 'PDF निर्यात',
+      expandAll: 'सभी फैलाएँ',
+      collapseAll: 'सभी समेटें',
+      removeCard: 'कार्ड हटाएँ',
+      copyCoords: 'निर्देशांक कॉपी करें',
+      copyMain: 'सार कॉपी करें',
+    },
+    'ur': {
+      title: 'EXIF استخراج کنندہ',
+      subtitle: 'تمام پراسیسنگ مقامی طور پر براؤزر میں ہوتی ہے۔ کوئی تصاویر اپ لوڈ نہیں ہوتیں۔',
+      dropTitle: 'تصاویر یہاں کھینچیں',
+      or: 'یا',
+      chooseFiles: 'فائلیں منتخب کریں',
+      hint: 'JPG، PNG، HEIC، AVIF، TIFF، NEF… معاون۔ ایک فائل ≤ 50MB کی سفارش۔',
+      clear: 'نتائج صاف کریں',
+      exifrLoadFail: 'exifr لوڈ کرنے میں ناکامی۔ براہ کرم نیٹ ورک چیک کریں اور دوبارہ کوشش کریں۔',
+      statusNoExif: 'EXIF ڈیٹا نہیں ملا',
+      camera: 'کیمرہ', lens: 'لینس', time: 'وقت', iso: 'ISO', aperture: 'اپرچر', shutter: 'شٹر', focal: 'فوکل لمبائی', gps: 'GPS', error: 'خرابی',
+      map: 'Google Maps میں کھولیں',
+      copy: 'JSON نقل کریں', copied: 'نقل ہو گیا!', copyFail: 'نقل ناکام', jsonSummary: 'مکمل JSON دیکھیں',
+      ariaDropzone: 'ڈریگ اینڈ ڈراپ کریں یا اپ لوڈ کیلئے کلک کریں',
+      analyzeUrl: 'URL کا تجزیہ', pasteImage: 'تصویر چسپاں کریں', urlPlaceholder: 'تصویر کا URL چسپاں کریں',
+      urlEmpty: 'براہ کرم تصویر کا URL درج کریں', urlFetchFail: 'تصویر حاصل کرنے میں ناکامی۔ سرور CORS روک سکتا ہے۔',
+      pasteNotAllowed: 'کلپ بورڈ رسائی مسترد یا غیر معاون۔',
+      exportJSON: 'JSON برآمد کریں', exportCSV: 'CSV برآمد کریں',
+      edited: 'ترمیم شدہ',
+      original: 'اصلی',
+      noExifShort: 'بغیر EXIF',
+      software: 'سافٹ ویئر',
+      rawInfo: 'RAW تفصیل', bitDepth: 'بٹ گہرائی', compression: 'کمپریشن', whiteBalance: 'وائٹ بیلنس',
+      makerNote: 'MakerNote',
+      hashMD5: 'MD5', hashSHA256: 'SHA-256',
+      digitalSignature: 'ڈیجیٹل دستخط', signaturePresent: 'موجود', signatureAbsent: 'نہیں ملا',
+      exportPDF: 'PDF برآمد',
+      expandAll: 'سب پھیلا دیں',
+      collapseAll: 'سب سمیٹ دیں',
+      removeCard: 'کارڈ حذف کریں',
+      copyCoords: 'کو آرڈینیٹس نقل کریں',
+      copyMain: 'خلاصہ نقل کریں',
+    },
   }
   let currentLang = detectPreferredLang()
   const parsedResults = []
@@ -210,6 +276,8 @@
       if (s.startsWith('es')) return 'es'
       if (s.startsWith('fr')) return 'fr'
       if (s.startsWith('ar')) return 'ar'
+      if (s.startsWith('hi')) return 'hi'
+      if (s.startsWith('ur')) return 'ur'
       if (s.startsWith('en')) return 'en'
     }
     return 'en'
@@ -229,21 +297,23 @@
     }
     if (clearButtonElement) clearButtonElement.textContent = t('clear')
     // button shows the NEXT language to switch to
-    const seq = ['en','zh-Hant','es','fr','ar']
+    const seq = ['en','zh-Hant','es','fr','ar','hi','ur']
     const nextLang = seq[(Math.max(0, seq.indexOf(currentLang)) + 1) % seq.length]
     if (langToggleButton) {
       langToggleButton.textContent = (
         nextLang === 'zh-Hant' ? '中文' :
         nextLang === 'es' ? 'ES' :
         nextLang === 'fr' ? 'FR' :
-        nextLang === 'ar' ? 'AR' :
+        nextLang === 'ar' ? 'العربية' :
+        nextLang === 'hi' ? 'हिन्दी' :
+        nextLang === 'ur' ? 'اردو' :
         'EN'
       )
     }
     if (dropzoneElement) dropzoneElement.setAttribute('aria-label', t('ariaDropzone'))
     // reflect current lang on <html>
     try { document.documentElement.lang = currentLang } catch {}
-    try { document.documentElement.dir = (currentLang === 'ar' ? 'rtl' : 'ltr') } catch {}
+    try { document.documentElement.dir = (currentLang === 'ar' || currentLang === 'ur' ? 'rtl' : 'ltr') } catch {}
 
     // URL/Paste/Export controls text
     if (analyzeUrlButton) analyzeUrlButton.textContent = t('analyzeUrl')
@@ -270,7 +340,7 @@
 
   if (langToggleButton) {
     langToggleButton.addEventListener('click', () => {
-      const seq = ['en','zh-Hant','es','fr','ar']
+      const seq = ['en','zh-Hant','es','fr','ar','hi','ur']
       const nextLang = seq[(Math.max(0, seq.indexOf(currentLang)) + 1) % seq.length]
       currentLang = nextLang
       applyStaticTexts()
@@ -652,6 +722,8 @@
       if (currentLang === 'es') return `Analizados ${n} | Con GPS ${gps} | Editados ${edited}`
       if (currentLang === 'fr') return `Analysés ${n} | GPS ${gps} | Modifiés ${edited}`
       if (currentLang === 'ar') return `تم التحليل ${n} | يحتوي على GPS ${gps} | معدَّلة ${edited}`
+      if (currentLang === 'hi') return `अनुसरण किया ${n} | GPS ${gps} | संशोधित ${edited}`
+      if (currentLang === 'ur') return `تحلیل کیا ہے ${n} | GPS ${gps} | ترمیم شدہ ${edited}`
       return `Parsed ${n} | GPS ${gps} | Edited ${edited}`
     } catch {
       return `Parsed ${n} | GPS ${gps} | Edited ${edited}`
