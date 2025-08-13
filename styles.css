@@ -35,9 +35,9 @@ body{
 .browse-button{display:inline-block; background:var(--accent); color:#fff; padding:10px 14px; border-radius:10px; cursor:pointer}
 .browse-button:hover{background:var(--accent-2)}
 .dz-hint{margin:10px 0 0; color:var(--muted)}
-/* 新增：拖曳區圖示與自動提示 */
+/* Add: dropzone icon and tooltip */
 .dz-icon{display:flex;justify-content:center;margin-bottom:8px;color:var(--muted)}
-/* 自動提示：預設隱藏，拖曳/聚焦時顯示 */
+/* Tooltip: hidden by default; shown on drag/focus */
 .dz-tooltip{display:none;position:absolute;left:50%;transform:translateX(-50%);top:100%;margin-top:8px;background:#0b1326;color:var(--text);border:1px solid var(--border);padding:10px 12px;border-radius:10px;box-shadow:0 10px 30px rgba(0,0,0,.45);max-width:min(520px, 92%);text-align:center;z-index:10}
 .dropzone.is-dragover .dz-tooltip,
 .dropzone:focus .dz-tooltip{display:block}
@@ -46,7 +46,7 @@ body{
 .toolbar-sep{width:1px;height:28px;background:var(--border);margin:0 6px}
 .toolbar-top-right{justify-content:flex-end}
 .toolbar-url{justify-content:center}
-/* 與拖曳區保持距離 */
+/* Keep spacing from dropzone */
 .uploader-section .toolbar-top-right{margin-bottom:12px}
 .btn{
   appearance:none; border:1px solid var(--border); background:#0e1629; color:var(--text);
@@ -56,7 +56,7 @@ body{
 .btn:disabled{opacity:.5; cursor:not-allowed}
 .btn.primary{background:var(--accent); border-color:var(--accent); color:#fff}
 .btn.danger{background:#2a0c11; border-color:#461217; color:#ffd7db}
-/* 清除結果按鈕更醒目 */
+/* Make clear results button more prominent */
 #clear-button{background:#2a0c11;border-color:#4a0f16;color:#ffd7db}
 #clear-button:hover{background:#3a1117;border-color:#61161e}
 
@@ -84,7 +84,7 @@ body{
 .file-name{font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
 .file-size{color:var(--muted); font-size:12px}
 
-/* 新增：檔案狀態徽章列 */
+/* Add: file status badges row */
 .file-status{margin-top:4px}
 .file-status .badge{margin-right:6px}
 
@@ -99,9 +99,9 @@ pre.json{max-height:240px; overflow:auto; background:#0b1326; border:1px solid v
 .badge{display:inline-block; padding:2px 8px; border-radius:999px; font-size:12px; border:1px solid var(--border); color:var(--muted)}
 .link{color:var(--accent)}
 
-/* RAW/NEF 等無法預覽時的字母縮圖 */
+/* Letter thumbnail when RAW/NEF etc. cannot be previewed */
 .file-thumb-fallback{display:flex;align-items:center;justify-content:center;font-weight:700;color:#a9b8e8;background:linear-gradient(180deg,#0c1427,#0b1326);text-transform:uppercase}
-/* 可收合的 JSON 區塊 */
+/* Collapsible JSON block */
 .json-block{margin-top:8px;background:#0b1326;border:1px solid var(--border);border-radius:10px}
 .json-block summary{cursor:pointer;padding:8px 10px;color:var(--muted);user-select:none}
 .json-block summary::-webkit-details-marker{display:none}
@@ -110,25 +110,25 @@ pre.json{max-height:240px; overflow:auto; background:#0b1326; border:1px solid v
 
 .card:hover{border-color:#2a3554}
 
-/* 新增：徽章顏色語意 */
+/* Add: badge color semantics */
 .badge.success{border-color:rgba(15,185,129,.35); color:#c1f2e2; background:rgba(15,185,129,.08)}
 .badge.danger{border-color:rgba(229,72,77,.35); color:#ffd9db; background:rgba(229,72,77,.08)}
 
-/* 新增：可疑欄位標示 */
+/* Add: suspect field highlight */
 .kv .val.is-suspect{color:#ffd9db}
 .kv .key.is-suspect{color:#ff9aa0}
 
-/* 新增：表格類資訊（RAW、Hash、MakerNote）*/
+/* Add: table-like info (RAW, Hash, MakerNote) */
 .info-table{display:grid;grid-template-columns:160px 1fr;gap:6px 10px;margin-top:6px;font-size:13px}
 .info-table .key{color:var(--muted)}
 .info-table .val{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 
-/* 新增：MakerNote 區塊 */
+/* Add: MakerNote section */
 .makernote{margin-top:6px;background:#0b1326;border:1px dashed var(--border);border-radius:10px;padding:8px}
 .makernote .title{font-size:14px;margin:0 0 6px 0;color:var(--muted)}
 .makernote pre{margin:0;max-height:200px;overflow:auto}
 
-/* ===== PDF 報告樣式（離屏渲染） ===== */
+/* ===== PDF report styles (off-screen rendering) ===== */
 .pdf-report-root{position:fixed;left:-200vw;top:0;opacity:0.01;pointer-events:none;z-index:-1}
 .pdf-page{width:794px;height:1123px;background:#ffffff;color:#1f2937;border:1px solid #e5e7eb;border-radius:8px;padding:32px 36px;display:flex;flex-direction:column;font:14px/1.6 system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,'Noto Sans TC','PingFang TC','Microsoft JhengHei',sans-serif}
 .pdf-header{display:flex;align-items:center;justify-content:space-between;padding-bottom:10px;border-bottom:2px solid #4f8cff;margin-bottom:18px}
@@ -146,7 +146,7 @@ pre.json{max-height:240px; overflow:auto; background:#0b1326; border:1px solid v
 .pdf-table .val{color:#1f2937;word-break:break-all}
 .pdf-footer{margin-top:auto;text-align:right;font-size:11px;color:#9ca3af}
 
-/* ===== END PDF 報告樣式 ===== */
+/* ===== END PDF report styles ===== */
 
 @media (max-width: 720px){
   .card{flex-direction:column}

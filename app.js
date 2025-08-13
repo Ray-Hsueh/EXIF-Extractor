@@ -379,7 +379,7 @@
       const nextLang = seq[(Math.max(0, seq.indexOf(currentLang)) + 1) % seq.length]
       currentLang = nextLang
       applyStaticTexts()
-      // 重新渲染目前結果卡片的欄位名稱
+      // Re-render field labels for current result cards
       rerenderAllCardsLabels()
       updateLangSegmentsActive()
       saveLangPreference(currentLang)
@@ -450,7 +450,7 @@
       const mdt = exif?.ModifyDate
       if (dto instanceof Date && mdt instanceof Date) {
         const delta = mdt.getTime() - dto.getTime()
-        // 閾值：2 分鐘以上的時間差，視為曾修改（避免相機寫入的毫秒級差異）
+        // Threshold: time delta > 2 minutes counts as edited (avoid ms-level differences written by camera)
         if (Number.isFinite(delta) && Math.abs(delta) > 2 * 60 * 1000) return true
       }
       const softwareRaw = exif?.Software || exif?.ProcessingSoftware || fallback?.exif?.Software?.description || fallback?.exif?.ProcessingSoftware?.description
@@ -533,7 +533,7 @@
     sizeEl.className = 'file-size'
     sizeEl.textContent = `${formatFileSize(file.size)}`
 
-    // 新增：狀態顯示容器
+    // Status display container
     const statusEl = document.createElement('div')
     statusEl.className = 'file-status'
 
@@ -645,7 +645,7 @@
         default: break
       }
     })
-    // 更新動作按鈕文字（依據 data-action）與 JSON 摺疊標題
+    // Update action button labels (by data-action) and JSON summary title
     resultsElement.querySelectorAll('.card .actions .btn').forEach(btn => {
       const act = btn.dataset.action || ''
       if (act === 'map') btn.textContent = t('map')
@@ -655,7 +655,7 @@
       else if (act === 'remove-card') btn.textContent = t('removeCard')
     })
     resultsElement.querySelectorAll('.json-block > summary').forEach(s => s.textContent = t('jsonSummary'))
-    // 新增：更新檔案狀態徽章的文字
+    // Update file status badge labels
     resultsElement.querySelectorAll('.file-status [data-status]')
       .forEach(s => {
         const st = s.getAttribute('data-status')
@@ -825,7 +825,7 @@
 
       for (let idx = 0; idx < cards.length; idx++) {
         const card = cards[idx]
-        // 讀取原卡片資訊
+        // Read original card info
         const name = card.querySelector('.file-name')?.textContent || ''
         const size = card.querySelector('.file-size')?.textContent || ''
         const statusText = card.querySelector('.file-status .badge')?.textContent || ''
@@ -837,12 +837,12 @@
         const vals = Array.from(card.querySelectorAll('.kv .val')).map(v => v.textContent)
         for (let i=0;i<Math.min(keys.length, vals.length);i++) {
           const k = keys[i]; const v = vals[i]
-          // 過濾掉 Status/JSON 之類不必要的
+          // Filter out unnecessary entries like Status/JSON
           if (!k || !v) continue
           tablePairs.push([k, v])
         }
 
-        // 建立漂亮頁面 DOM
+        // Build page DOM
         const page = mk('div','pdf-page')
         const header = mk('div','pdf-header')
         header.appendChild(mk('div','pdf-title', t('title')))
@@ -852,7 +852,7 @@
 
         const body = mk('div','pdf-body')
         const left = mk('div')
-        // 縮圖
+        // Thumbnail
         if (imgEl) {
           const thumb = mk('img','pdf-thumb')
           try {
@@ -869,7 +869,7 @@
           } catch { thumb.src = imgEl.src }
           left.appendChild(thumb)
         }
-        // 檔名/大小/狀態
+        // Filename/Size/Status
         const fileinfo = mk('div','pdf-fileinfo', `${name}\n${size}`)
         left.appendChild(fileinfo)
         if (statusText) {
@@ -893,7 +893,7 @@
         page.appendChild(footer)
         root.appendChild(page)
 
-        // 轉為 canvas 並加入 PDF（同步逐頁）
+        // Render to canvas and add to PDF (sync per page)
         const canvas = await window.html2canvas(page, { backgroundColor: '#ffffff', scale: 2, useCORS: true, allowTaint: true })
         const imgData = canvas.toDataURL('image/jpeg', 0.95)
         const imgW = pageW - margin * 2
