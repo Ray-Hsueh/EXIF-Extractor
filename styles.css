@@ -163,19 +163,19 @@ pre.json{max-height:240px; overflow:auto; background:#0b1326; border:1px solid v
   .kv .val{grid-column:1; word-break:break-word; white-space:normal}
   .toolbar-top-right{justify-content:center}
   .toolbar-url{justify-content:center}
-  /* 手機版按鈕區塊橫向滑動 */
+  /* Mobile version button block horizontal sliding */
   .actions{overflow-x:auto; overflow-y:hidden; scrollbar-width:none; -ms-overflow-style:none; padding-bottom:8px}
   .actions::-webkit-scrollbar{display:none}
   .actions .btn{flex-shrink:0; min-width:auto; white-space:nowrap}
-  /* 手機版卡片內容優化 */
+  /* Optimisation of mobile card content */
   .card-body{padding:16px}
   .json-block{margin-top:12px}
   .json-block summary{padding:12px}
   .json-block pre.json{padding:12px; font-size:13px}
-  /* 手機版狀態徽章優化 */
+  /* Optimisation of mobile version status badges */
   .file-status{margin-top:8px}
   .file-status .badge{font-size:11px; padding:4px 8px}
-  /* 手機版 MakerNote 優化 */
+  /* Optimisation of MakerNote for mobile */
   .makernote{margin-top:12px; padding:12px}
   .info-table{grid-template-columns:1fr; gap:8px}
   .info-table .key{font-weight:600; color:var(--text); border-bottom:1px solid var(--border); padding-bottom:4px}
