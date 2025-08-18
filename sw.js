@@ -1,5 +1,5 @@
 'use strict'
-const CACHE_NAME = 'exif-extractor-v3'
+const CACHE_NAME = 'exif-extractor-v4'
 const CORE_ASSETS = [
   '/',
   '/index.html',
@@ -9,6 +9,14 @@ const CORE_ASSETS = [
   '/manifest.webmanifest',
   '/icons/icon-192.png',
   '/icons/icon-512.png',
+  '/locales/en.json',
+  '/locales/zh-Hant.json',
+  '/locales/es.json',
+  '/locales/fr.json',
+  '/locales/ar.json',
+  '/locales/hi.json',
+  '/locales/ur.json',
+  '/locales/ja.json',
 ]
 
 self.addEventListener('install', event => {

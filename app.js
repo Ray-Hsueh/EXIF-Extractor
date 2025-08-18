@@ -20,280 +20,32 @@
   const browseLabelElement = document.querySelector('.browse-button')
   const langSegmentButtons = Array.from(document.querySelectorAll('.segmented .segment'))
 
-  // i18n
-  const MESSAGES = {
-    'en': {
-      title: 'EXIF Extractor',
-      subtitle: 'All parsing happens locally. No photos are uploaded.',
-      dropTitle: 'Drag photos here',
-      or: 'or',
-      chooseFiles: 'Choose files',
-      hint: 'Supports JPG, PNG, HEIC, AVIF, TIFF, NEF… Recommended single file ≤ 50MB.',
-      clear: 'Clear all',
-      exifrLoadFail: 'Failed to load exifr. Please check your network and retry.',
-      statusNoExif: 'No EXIF data found',
-      camera: 'Camera', lens: 'Lens', time: 'Time', iso: 'ISO', aperture: 'Aperture', shutter: 'Shutter', focal: 'Focal length', gps: 'GPS', error: 'Error',
-      map: 'Open in Google Maps',
-      copy: 'Copy JSON', copied: 'Copied!', copyFail: 'Copy failed', jsonSummary: 'View full JSON',
-      ariaDropzone: 'Drag and drop or click to upload photos',
-      analyzeUrl: 'Analyze URL', pasteImage: 'Paste image', urlPlaceholder: 'Paste image URL',
-      urlEmpty: 'Please enter an image URL', urlFetchFail: 'Failed to fetch image. The server may block CORS.',
-      pasteNotAllowed: 'Clipboard image access was denied or unsupported.',
-      exportJSON: 'Export JSON', exportCSV: 'Export CSV',
-      // added for status badge
-      edited: 'Edited',
-      original: 'Original',
-      noExifShort: 'No EXIF',
-      // new labels
-      software: 'Software',
-      rawInfo: 'RAW details', bitDepth: 'Bit depth', compression: 'Compression', whiteBalance: 'White balance',
-      makerNote: 'MakerNote',
-      hashMD5: 'MD5', hashSHA256: 'SHA-256',
-      digitalSignature: 'Digital signature', signaturePresent: 'Present', signatureAbsent: 'Not detected',
-      exportPDF: 'Export PDF',
-      expandAll: 'Expand all',
-      collapseAll: 'Collapse all',
-      removeCard: 'Remove card',
-      copyMain: 'Copy summary',
-    },
-    'zh-Hant': {
-      title: 'EXIF 解析器',
-      subtitle: '所有解析在瀏覽器本地進行，不會上傳照片。',
-      dropTitle: '拖曳照片到這裡',
-      or: '或',
-      chooseFiles: '點擊選取檔案',
-      hint: '支援 JPG、PNG、HEIC、AVIF、TIFF、NEF… 建議單檔 ≤ 50MB。',
-      clear: '清除全部',
-      exifrLoadFail: 'exifr 載入失敗，請檢查網路或稍後再試。',
-      statusNoExif: '找不到 EXIF 資料',
-      camera: '相機', lens: '鏡頭', time: '時間', iso: 'ISO', aperture: '光圈', shutter: '快門', focal: '焦距', gps: 'GPS', error: '錯誤',
-      map: '在 Google Maps 開啟',
-      copy: '複製 JSON', copied: '已複製!', copyFail: '複製失敗', jsonSummary: '查看完整 JSON',
-      ariaDropzone: '拖曳或點擊上傳照片',
-      analyzeUrl: '分析網址', pasteImage: '貼上圖片', urlPlaceholder: '貼上圖片網址',
-      urlEmpty: '請輸入圖片網址', urlFetchFail: '圖片下載失敗，來源可能未允許跨來源存取（CORS）。',
-      pasteNotAllowed: '無法讀取剪貼簿圖片，可能是權限被拒或瀏覽器不支援。',
-      exportJSON: '匯出 JSON', exportCSV: '匯出 CSV',
-      // added for status badge
-      edited: '已修改',
-      original: '原始',
-      noExifShort: '無 EXIF',
-      // new labels
-      software: '軟體',
-      rawInfo: 'RAW 詳細', bitDepth: '位元深度', compression: '壓縮模式', whiteBalance: '白平衡',
-      makerNote: 'MakerNote',
-      hashMD5: 'MD5', hashSHA256: 'SHA-256',
-      digitalSignature: '數位簽章', signaturePresent: '已偵測', signatureAbsent: '未偵測',
-      exportPDF: '匯出 PDF',
-      expandAll: '全部展開',
-      collapseAll: '全部收起',
-      removeCard: '移除此卡',
-      copyMain: '複製主要欄位',
-    },
-    'es': {
-      title: 'Extractor EXIF',
-      subtitle: 'Todo el análisis se realiza localmente. No se suben fotos.',
-      dropTitle: 'Arrastra fotos aquí',
-      or: 'o',
-      chooseFiles: 'Elegir archivos',
-      hint: 'Compatible con JPG, PNG, HEIC, AVIF, TIFF, NEF… Se recomienda archivo individual ≤ 50 MB.',
-      clear: 'Limpiar todo',
-      exifrLoadFail: 'No se pudo cargar exifr. Verifica tu red e inténtalo de nuevo.',
-      statusNoExif: 'No se encontraron datos EXIF',
-      camera: 'Cámara', lens: 'Objetivo', time: 'Hora', iso: 'ISO', aperture: 'Apertura', shutter: 'Obturación', focal: 'Longitud focal', gps: 'GPS', error: 'Error',
-      map: 'Abrir en Google Maps',
-      copy: 'Copiar JSON', copied: '¡Copiado!', copyFail: 'Error al copiar', jsonSummary: 'Ver JSON completo',
-      ariaDropzone: 'Arrastra y suelta o haz clic para subir fotos',
-      analyzeUrl: 'Analizar URL', pasteImage: 'Pegar imagen', urlPlaceholder: 'Pega la URL de la imagen',
-      urlEmpty: 'Ingresa una URL de imagen', urlFetchFail: 'Error al descargar imagen. El servidor podría bloquear CORS.',
-      pasteNotAllowed: 'No se pudo acceder al portapapeles o no es compatible.',
-      exportJSON: 'Exportar JSON', exportCSV: 'Exportar CSV',
-      // added for status badge
-      edited: 'Editado',
-      original: 'Original',
-      noExifShort: 'Sin EXIF',
-      // new labels
-      software: 'Software',
-      rawInfo: 'Detalles RAW', bitDepth: 'Profundidad de bits', compression: 'Compresión', whiteBalance: 'Balance de blancos',
-      makerNote: 'MakerNote',
-      hashMD5: 'MD5', hashSHA256: 'SHA-256',
-      digitalSignature: 'Firma digital', signaturePresent: 'Presente', signatureAbsent: 'No detectado',
-      exportPDF: 'Exportar PDF',
-      expandAll: 'Expandir todo',
-      collapseAll: 'Contraer todo',
-      removeCard: 'Eliminar tarjeta',
-      copyMain: 'Copiar resumen',
-    },
-    'fr': {
-      title: 'Extracteur EXIF',
-      subtitle: 'Toutes les analyses sont effectuées localement. Aucune photo n\'est envoyée.',
-      dropTitle: 'Glissez des photos ici',
-      or: 'ou',
-      chooseFiles: 'Choisir des fichiers',
-      hint: 'Prend en charge JPG, PNG, HEIC, AVIF, TIFF, NEF… Fichier unique recommandé ≤ 50 Mo.',
-      clear: 'Tout effacer',
-      exifrLoadFail: "Échec du chargement d'exifr. Vérifiez votre réseau et réessayez.",
-      statusNoExif: 'Aucune donnée EXIF trouvée',
-      camera: 'Appareil photo', lens: 'Objectif', time: 'Heure', iso: 'ISO', aperture: 'Ouverture', shutter: 'Vitesse', focal: 'Distance focale', gps: 'GPS', error: 'Erreur',
-      map: 'Ouvrir dans Google Maps',
-      copy: 'Copier le JSON', copied: 'Copié !', copyFail: 'Échec de la copie', jsonSummary: 'Voir le JSON complet',
-      ariaDropzone: 'Glissez-déposez ou cliquez pour importer des photos',
-      analyzeUrl: 'Analyser l\'URL', pasteImage: 'Coller l\'image', urlPlaceholder: 'Coller l\'URL de l\'image',
-      urlEmpty: 'Veuillez entrer une URL d\'image', urlFetchFail: 'Échec du chargement de l\'image. Le serveur peut bloquer CORS.',
-      pasteNotAllowed: 'Accès au presse‑papiers refusé ou non pris en charge.',
-      exportJSON: 'Exporter le JSON', exportCSV: 'Exporter le CSV',
-      edited: 'Modifié',
-      original: 'Original',
-      noExifShort: 'Sans EXIF',
-      software: 'Logiciel',
-      rawInfo: 'Détails RAW', bitDepth: 'Profondeur de bits', compression: 'Compression', whiteBalance: 'Balance des blancs',
-      makerNote: 'MakerNote',
-      hashMD5: 'MD5', hashSHA256: 'SHA-256',
-      digitalSignature: 'Signature numérique', signaturePresent: 'Présente', signatureAbsent: 'Non détectée',
-      exportPDF: 'Exporter en PDF',
-      expandAll: 'Tout développer',
-      collapseAll: 'Tout réduire',
-      removeCard: 'Supprimer la carte',
-      copyMain: 'Copier le résumé',
-    },
-    'ar': {
-      title: 'مستخرج EXIF',
-      subtitle: 'تتم جميع المعالجة محليًا. لا يتم رفع أي صور.',
-      dropTitle: 'اسحب الصور هنا',
-      or: 'أو',
-      chooseFiles: 'اختر الملفات',
-      hint: 'يدعم JPG وPNG وHEIC وAVIF وTIFF وNEF… يُنصح بأن يكون حجم الملف الواحد ≤ 50 ميجابايت.',
-      clear: 'مسح الكل',
-      exifrLoadFail: 'فشل تحميل exifr. يرجى التحقق من الشبكة والمحاولة مرة أخرى.',
-      statusNoExif: 'لا توجد بيانات EXIF',
-      camera: 'الكاميرا', lens: 'العدسة', time: 'الوقت', iso: 'ISO', aperture: 'فتحة العدسة', shutter: 'سرعة الغالق', focal: 'البعد البؤري', gps: 'GPS', error: 'خطأ',
-      map: 'افتح في خرائط Google',
-      copy: 'نسخ JSON', copied: 'تم النسخ!', copyFail: 'فشل النسخ', jsonSummary: 'عرض JSON الكامل',
-      ariaDropzone: 'اسحب وأفلت أو انقر لرفع الصور',
-      analyzeUrl: 'تحليل الرابط', pasteImage: 'لصق الصورة', urlPlaceholder: 'ألصق رابط الصورة',
-      urlEmpty: 'يرجى إدخال رابط صورة', urlFetchFail: 'فشل جلب الصورة. قد يمنع الخادم CORS.',
-      pasteNotAllowed: 'الوصول إلى الحافظة مرفوض أو غير مدعوم.',
-      exportJSON: 'تصدير JSON', exportCSV: 'تصدير CSV',
-      edited: 'معدّل',
-      original: 'أصلي',
-      noExifShort: 'بدون EXIF',
-      software: 'البرنامج',
-      rawInfo: 'تفاصيل RAW', bitDepth: 'عمق البت', compression: 'الضغط', whiteBalance: 'توازن اللون الأبيض',
-      makerNote: 'MakerNote',
-      hashMD5: 'MD5', hashSHA256: 'SHA-256',
-      digitalSignature: 'التوقيع الرقمي', signaturePresent: 'موجود', signatureAbsent: 'غير موجود',
-      exportPDF: 'تصدير PDF',
-      expandAll: 'توسيع الكل',
-      collapseAll: 'طي الكل',
-      removeCard: 'إزالة البطاقة',
-      copyMain: 'نسخ الملخص',
-    },
-    'hi': {
-      title: 'EXIF एक्सट्रैक्टर',
-      subtitle: 'सारी प्रोसेसिंग आपके ब्राउज़र में स्थानीय रूप से होती है। कोई फोटो अपलोड नहीं होती।',
-      dropTitle: 'फोटो यहाँ खींचें',
-      or: 'या',
-      chooseFiles: 'फ़ाइलें चुनें',
-      hint: 'JPG, PNG, HEIC, AVIF, TIFF, NEF… समर्थित। एकल फ़ाइल ≤ 50MB सुझाव।',
-      clear: 'सब साफ़ करें',
-      exifrLoadFail: 'exifr लोड विफल। कृपया नेटवर्क जाँचें और पुनः प्रयास करें।',
-      statusNoExif: 'EXIF डेटा नहीं मिला',
-      camera: 'कैमरा', lens: 'लेंस', time: 'समय', iso: 'ISO', aperture: 'एपर्चर', shutter: 'शटर', focal: 'फोकल लंबाई', gps: 'GPS', error: 'त्रुटि',
-      map: 'Google Maps में खोलें',
-      copy: 'JSON कॉपी करें', copied: 'कॉपी हो गया!', copyFail: 'कॉपी विफल', jsonSummary: 'पूर्ण JSON देखें',
-      ariaDropzone: 'ड्रैग-एंड-ड्रॉप करें या क्लिक कर अपलोड करें',
-      analyzeUrl: 'URL विश्लेषण', pasteImage: 'चित्र चिपकाएँ', urlPlaceholder: 'चित्र URL चिपकाएँ',
-      urlEmpty: 'कृपया चित्र URL दर्ज करें', urlFetchFail: 'चित्र लाने में विफल। सर्वर CORS अवरोधित कर सकता है।',
-      pasteNotAllowed: 'क्लिपबोर्ड एक्सेस अस्वीकृत या असमर्थित।',
-      exportJSON: 'JSON निर्यात', exportCSV: 'CSV निर्यात',
-      edited: 'संशोधित',
-      original: 'मूल',
-      noExifShort: 'EXIF नहीं',
-      software: 'सॉफ्टवेयर',
-      rawInfo: 'RAW विवरण', bitDepth: 'बिट गहराई', compression: 'कंप्रेशन', whiteBalance: 'व्हाइट बैलेंस',
-      makerNote: 'MakerNote',
-      hashMD5: 'MD5', hashSHA256: 'SHA-256',
-      digitalSignature: 'डिजिटल हस्ताक्षर', signaturePresent: 'मौजूद', signatureAbsent: 'नहीं मिला',
-      exportPDF: 'PDF निर्यात',
-      expandAll: 'सभी फैलाएँ',
-      collapseAll: 'सभी समेटें',
-      removeCard: 'कार्ड हटाएँ',
-      copyMain: 'सार कॉपी करें',
-    },
-    'ur': {
-      title: 'EXIF استخراج کنندہ',
-      subtitle: 'تمام پراسیسنگ مقامی طور پر براؤزر میں ہوتی ہے۔ کوئی تصاویر اپ لوڈ نہیں ہوتیں۔',
-      dropTitle: 'تصاویر یہاں کھینچیں',
-      or: 'یا',
-      chooseFiles: 'فائلیں منتخب کریں',
-      hint: 'JPG، PNG، HEIC، AVIF، TIFF، NEF… معاون۔ ایک فائل ≤ 50MB کی سفارش۔',
-      clear: 'سب صاف کریں',
-      exifrLoadFail: 'exifr لوڈ کرنے میں ناکامی۔ براہ کرم نیٹ ورک چیک کریں اور دوبارہ کوشش کریں۔',
-      statusNoExif: 'EXIF ڈیٹا نہیں ملا',
-      camera: 'کیمرہ', lens: 'لینس', time: 'وقت', iso: 'ISO', aperture: 'اپرچر', shutter: 'شٹر', focal: 'فوکل لمبائی', gps: 'GPS', error: 'خرابی',
-      map: 'Google Maps میں کھولیں',
-      copy: 'JSON نقل کریں', copied: 'نقل ہو گیا!', copyFail: 'نقل ناکام', jsonSummary: 'مکمل JSON دیکھیں',
-      ariaDropzone: 'ڈریگ اینڈ ڈراپ کریں یا اپ لوڈ کیلئے کلک کریں',
-      analyzeUrl: 'URL کا تجزیہ', pasteImage: 'تصویر چسپاں کریں', urlPlaceholder: 'تصویر کا URL چسپاں کریں',
-      urlEmpty: 'براہ کرم تصویر کا URL درج کریں', urlFetchFail: 'تصویر حاصل کرنے میں ناکامی۔ سرور CORS روک سکتا ہے۔',
-      pasteNotAllowed: 'کلپ بورڈ رسائی مسترد یا غیر معاون۔',
-      exportJSON: 'JSON برآمد کریں', exportCSV: 'CSV برآمد کریں',
-      edited: 'ترمیم شدہ',
-      original: 'اصلی',
-      noExifShort: 'بغیر EXIF',
-      software: 'سافٹ ویئر',
-      rawInfo: 'RAW تفصیل', bitDepth: 'بٹ گہرائی', compression: 'کمپریشن', whiteBalance: 'وائٹ بیلنس',
-      makerNote: 'MakerNote',
-      hashMD5: 'MD5', hashSHA256: 'SHA-256',
-      digitalSignature: 'ڈیجیٹل دستخط', signaturePresent: 'موجود', signatureAbsent: 'نہیں ملا',
-      exportPDF: 'PDF برآمد',
-      expandAll: 'سب پھیلا دیں',
-      collapseAll: 'سب سمیٹ دیں',
-      removeCard: 'کارڈ حذف کریں',
-      copyMain: 'خلاصہ نقل کریں',
-    },
-    'ja': {
-      title: 'EXIF エクストラクター',
-      subtitle: '解析はすべてローカルで実行され、写真はアップロードされません。',
-      dropTitle: 'ここに写真をドラッグ',
-      or: 'または',
-      chooseFiles: 'ファイルを選択',
-      hint: 'JPG、PNG、HEIC、AVIF、TIFF、NEF… に対応。推奨: 単一ファイル ≤ 50MB。',
-      clear: 'すべてクリア',
-      exifrLoadFail: 'exifr の読み込みに失敗しました。ネットワークを確認して再試行してください。',
-      statusNoExif: 'EXIF データが見つかりません',
-      camera: 'カメラ', lens: 'レンズ', time: '時刻', iso: 'ISO', aperture: '絞り', shutter: 'シャッター', focal: '焦点距離', gps: 'GPS', error: 'エラー',
-      map: 'Google マップで開く',
-      copy: 'JSON をコピー', copied: 'コピーしました', copyFail: 'コピーに失敗', jsonSummary: 'JSON を表示',
-      ariaDropzone: 'ドラッグ＆ドロップ、またはクリックして写真をアップロード',
-      analyzeUrl: 'URL を解析', pasteImage: '画像を貼り付け', urlPlaceholder: '画像の URL を貼り付け',
-      urlEmpty: '画像 URL を入力してください', urlFetchFail: '画像の取得に失敗しました。サーバーが CORS をブロックしている可能性があります。',
-      pasteNotAllowed: 'クリップボード画像へのアクセスが拒否された、または未対応です。',
-      exportJSON: 'JSON を出力', exportCSV: 'CSV を出力',
-      edited: '編集済み',
-      original: 'オリジナル',
-      noExifShort: 'EXIF なし',
-      software: 'ソフトウェア',
-      rawInfo: 'RAW 詳細', bitDepth: 'ビット深度', compression: '圧縮方式', whiteBalance: 'ホワイトバランス',
-      makerNote: 'MakerNote',
-      hashMD5: 'MD5', hashSHA256: 'SHA-256',
-      digitalSignature: 'デジタル署名', signaturePresent: 'あり', signatureAbsent: 'なし',
-      exportPDF: 'PDF を出力',
-      expandAll: 'すべて展開',
-      collapseAll: 'すべて折りたたむ',
-      removeCard: 'カードを削除',
-      copyMain: '概要をコピー',
-    },
+  const SUPPORTED_LANGS = ['en','zh-Hant','es','fr','ar','hi','ur','ja']
+  const MESSAGES = {}
+
+  async function loadAllMessages() {
+    try {
+      const entries = await Promise.all(SUPPORTED_LANGS.map(async (lang) => {
+        const res = await fetch(`./locales/${lang}.json`)
+        if (!res.ok) throw new Error(`Failed to load locale: ${lang}`)
+        return [lang, await res.json()]
+      }))
+      for (const [lang, data] of entries) {
+        MESSAGES[lang] = data
+      }
+    } catch (err) {
+      console.error('Failed to load locales', err)
+    }
   }
   let currentLang = detectPreferredLang()
   const parsedResults = []
 
-  function t(key) { return MESSAGES[currentLang][key] || key }
+  function t(key) { return (MESSAGES[currentLang] && MESSAGES[currentLang][key]) || key }
 
   function detectPreferredLang() {
     try {
       const saved = localStorage.getItem('exif_lang')
-      if (saved && MESSAGES[saved]) return saved
+      if (saved && SUPPORTED_LANGS.includes(saved)) return saved
     } catch {}
     const langs = (navigator.languages && navigator.languages.length ? navigator.languages : [navigator.language || 'en']).map(s => String(s || '').toLowerCase())
     for (const s of langs) {
@@ -323,7 +75,7 @@
     }
     if (clearButtonElement) clearButtonElement.textContent = t('clear')
     // button shows the NEXT language to switch to
-    const seq = ['en','zh-Hant','es','fr','ar','hi','ur','ja']
+    const seq = SUPPORTED_LANGS
     const nextLang = seq[(Math.max(0, seq.indexOf(currentLang)) + 1) % seq.length]
     if (langToggleButton) {
       langToggleButton.textContent = (
@@ -363,11 +115,14 @@
     updateStats()
   }
 
-  applyStaticTexts()
+  ;(async () => {
+    await loadAllMessages()
+    applyStaticTexts()
+  })()
 
   if (langToggleButton) {
     langToggleButton.addEventListener('click', () => {
-      const seq = ['en','zh-Hant','es','fr','ar','hi','ur','ja']
+      const seq = SUPPORTED_LANGS
       const nextLang = seq[(Math.max(0, seq.indexOf(currentLang)) + 1) % seq.length]
       currentLang = nextLang
       applyStaticTexts()
