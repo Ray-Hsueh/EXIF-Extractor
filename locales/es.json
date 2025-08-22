@@ -18,6 +18,7 @@
   "gps": "GPS",
   "error": "Error",
   "map": "Abrir en Google Maps",
+  "openInOSM": "Abrir en OpenStreetMap",
   "copy": "Copiar JSON",
   "copied": "¡Copiado!",
   "copyFail": "Error al copiar",
@@ -49,5 +50,8 @@
   "expandAll": "Expandir todo",
   "collapseAll": "Contraer todo",
   "removeCard": "Eliminar tarjeta",
-  "copyMain": "Copiar resumen"
+  "copyMain": "Copiar resumen",
+  "mapPreview": "Vista previa del mapa",
+  "showMap": "Mostrar mapa",
+  "hideMap": "Ocultar mapa"
 } 

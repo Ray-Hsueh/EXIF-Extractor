@@ -18,6 +18,7 @@
   "gps": "GPS",
   "error": "خطأ",
   "map": "افتح في خرائط Google",
+  "openInOSM": "افتح في OpenStreetMap",
   "copy": "نسخ JSON",
   "copied": "تم النسخ!",
   "copyFail": "فشل النسخ",
@@ -49,5 +50,8 @@
   "expandAll": "توسيع الكل",
   "collapseAll": "طي الكل",
   "removeCard": "إزالة البطاقة",
-  "copyMain": "نسخ الملخص"
+  "copyMain": "نسخ الملخص",
+  "mapPreview": "معاينة الخريطة",
+  "showMap": "إظهار الخريطة",
+  "hideMap": "إخفاء الخريطة"
 } 

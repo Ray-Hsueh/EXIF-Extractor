@@ -39,7 +39,6 @@ self.addEventListener('fetch', event => {
   const req = event.request
 
   if (req.method !== 'GET') return
-  // Network-first for HTML to avoid stale UI
   const isHtml = req.mode === 'navigate' || req.destination === 'document' || (req.headers.get('accept') || '').includes('text/html')
   if (isHtml) {
     event.respondWith((async () => {
@@ -56,7 +55,6 @@ self.addEventListener('fetch', event => {
     return
   }
 
-  // Network-first for other same-origin GET requests (scripts, styles, images, manifest, etc.)
   event.respondWith((async () => {
     const cache = await caches.open(CACHE_NAME)
     try {

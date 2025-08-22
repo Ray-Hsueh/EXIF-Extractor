@@ -18,6 +18,7 @@
   "gps": "GPS",
   "error": "त्रुटि",
   "map": "Google Maps में खोलें",
+  "openInOSM": "OpenStreetMap में खोलें",
   "copy": "JSON कॉपी करें",
   "copied": "कॉपी हो गया!",
   "copyFail": "कॉपी विफल",
@@ -49,5 +50,8 @@
   "expandAll": "सभी फैलाएँ",
   "collapseAll": "सभी समेटें",
   "removeCard": "कार्ड हटाएँ",
-  "copyMain": "सार कॉपी करें"
+  "copyMain": "सार कॉपी करें",
+  "mapPreview": "मानचित्र पूर्वावलोकन",
+  "showMap": "मानचित्र दिखाएँ",
+  "hideMap": "मानचित्र छिपाएँ"
 } 

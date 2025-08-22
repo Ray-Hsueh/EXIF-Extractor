@@ -18,6 +18,7 @@
   "gps": "GPS",
   "error": "エラー",
   "map": "Google マップで開く",
+  "openInOSM": "OpenStreetMap で開く",
   "copy": "JSON をコピー",
   "copied": "コピーしました",
   "copyFail": "コピーに失敗",
@@ -49,5 +50,8 @@
   "expandAll": "すべて展開",
   "collapseAll": "すべて折りたたむ",
   "removeCard": "カードを削除",
-  "copyMain": "概要をコピー"
+  "copyMain": "概要をコピー",
+  "mapPreview": "地図プレビュー",
+  "showMap": "地図を表示",
+  "hideMap": "地図を隠す"
 } 

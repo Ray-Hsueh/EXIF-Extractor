@@ -18,6 +18,7 @@
   "gps": "GPS",
   "error": "خرابی",
   "map": "Google Maps میں کھولیں",
+  "openInOSM": "OpenStreetMap میں کھولیں",
   "copy": "JSON نقل کریں",
   "copied": "نقل ہو گیا!",
   "copyFail": "نقل ناکام",
@@ -49,5 +50,8 @@
   "expandAll": "سب پھیلا دیں",
   "collapseAll": "سب سمیٹ دیں",
   "removeCard": "کارڈ حذف کریں",
-  "copyMain": "خلاصہ نقل کریں"
+  "copyMain": "خلاصہ نقل کریں",
+  "mapPreview": "نقشہ پیش نظارہ",
+  "showMap": "نقشہ دکھائیں",
+  "hideMap": "نقشہ چھپائیں"
 } 

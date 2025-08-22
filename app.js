@@ -1,9 +1,7 @@
 (() => {
   'use strict'
 
-  /** @type {any} */
   const exifrLib = window.exifr
-  /** @type {any} */
   const ExifReader = window.ExifReader
 
   const dropzoneElement = document.getElementById('dropzone')
@@ -74,7 +72,6 @@
       if (el) el.textContent = t(k)
     }
     if (clearButtonElement) clearButtonElement.textContent = t('clear')
-    // button shows the NEXT language to switch to
     const seq = SUPPORTED_LANGS
     const nextLang = seq[(Math.max(0, seq.indexOf(currentLang)) + 1) % seq.length]
     if (langToggleButton) {
@@ -90,29 +87,53 @@
       )
     }
     if (dropzoneElement) dropzoneElement.setAttribute('aria-label', t('ariaDropzone'))
-    // reflect current lang on <html>
     try { document.documentElement.lang = currentLang } catch {}
     try { document.documentElement.dir = (currentLang === 'ar' || currentLang === 'ur' ? 'rtl' : 'ltr') } catch {}
 
-    // URL/Paste/Export controls text
     if (analyzeUrlButton) analyzeUrlButton.textContent = t('analyzeUrl')
     if (pasteButton) pasteButton.textContent = t('pasteImage')
     if (urlInputElement) urlInputElement.placeholder = t('urlPlaceholder')
     if (exportJsonButton) exportJsonButton.textContent = t('exportJSON')
     if (exportCsvButton) exportCsvButton.textContent = t('exportCSV')
     if (exportPdfButton) exportPdfButton.textContent = t('exportPDF')
-    // tooltip content for supported formats
     const dzTooltip = document.getElementById('dz-tooltip')
     if (dzTooltip) dzTooltip.textContent = t('hint')
 
-    // Expand/Collapse all buttons
     const expAll = document.getElementById('expand-all')
     if (expAll) { expAll.textContent = t('expandAll'); expAll.setAttribute('aria-label', t('expandAll')) }
     const colAll = document.getElementById('collapse-all')
     if (colAll) { colAll.textContent = t('collapseAll'); colAll.setAttribute('aria-label', t('collapseAll')) }
 
-    // Refresh stats text to current language
     updateStats()
+    resultsElement.querySelectorAll('.card .actions .btn').forEach(btn => {
+      const act = btn.dataset.action || ''
+      if (act === 'map') btn.textContent = t('map')
+      else if (act === 'copy-json') btn.textContent = t('copy')
+      else if (act === 'copy-main') btn.textContent = t('copyMain')
+    })
+    
+    resultsElement.querySelectorAll('.btn-icon[data-action="map"]').forEach(btn => {
+      btn.title = t('map')
+    })
+    resultsElement.querySelectorAll('.btn-icon[data-action="osm"]').forEach(btn => {
+      btn.title = t('openInOSM')
+    })
+    resultsElement.querySelectorAll('.json-block > summary').forEach(s => s.textContent = t('jsonSummary'))
+    resultsElement.querySelectorAll('.card .card-close').forEach(btn => btn.setAttribute('aria-label', t('removeCard')))
+
+    resultsElement.querySelectorAll('.file-status [data-status]')
+      .forEach(s => {
+        const st = s.getAttribute('data-status')
+        if (st === 'edited') s.textContent = t('edited')
+        else if (st === 'original') s.textContent = t('original')
+        else if (st === 'no-exif') s.textContent = t('noExifShort')
+      })
+
+    resultsElement.querySelectorAll('.map-title').forEach(el => el.textContent = t('mapPreview'))
+    resultsElement.querySelectorAll('.map-toggle').forEach(btn => {
+      const isVisible = btn.closest('.map-container').querySelector('.map-content').classList.contains('show')
+      btn.textContent = isVisible ? t('hideMap') : t('showMap')
+    })
   }
 
   ;(async () => {
@@ -126,7 +147,6 @@
       const nextLang = seq[(Math.max(0, seq.indexOf(currentLang)) + 1) % seq.length]
       currentLang = nextLang
       applyStaticTexts()
-      // Re-render field labels for current result cards
       rerenderAllCardsLabels()
       updateLangSegmentsActive()
       saveLangPreference(currentLang)
@@ -190,14 +210,12 @@
     return `1/${denom}`
   }
 
-  // Heuristics: detect if image likely edited (time delta, software tag)
   function isLikelyEdited(exif, fallback) {
     try {
       const dto = exif?.DateTimeOriginal || exif?.CreateDate
       const mdt = exif?.ModifyDate
       if (dto instanceof Date && mdt instanceof Date) {
         const delta = mdt.getTime() - dto.getTime()
-        // Threshold: time delta > 2 minutes counts as edited (avoid ms-level differences written by camera)
         if (Number.isFinite(delta) && Math.abs(delta) > 2 * 60 * 1000) return true
       }
       const softwareRaw = exif?.Software || exif?.ProcessingSoftware || fallback?.exif?.Software?.description || fallback?.exif?.ProcessingSoftware?.description
@@ -208,7 +226,6 @@
     } catch { return false }
   }
 
-  // Try to extract an embeddable preview from RAW using ExifReader
   async function trySetRawPreviewFromFallback(ui, fallback) {
     try {
       if (!fallback) return
@@ -236,7 +253,6 @@
     } catch {}
   }
 
-  // Compute hashes for integrity checks
   async function computeHashesFromArrayBuffer(ab) {
     const md5 = (window.SparkMD5 && window.SparkMD5.ArrayBuffer) ? window.SparkMD5.ArrayBuffer.hash(ab) : ''
     let sha256 = ''
@@ -269,7 +285,6 @@
     const objectUrl = URL.createObjectURL(file)
     img.src = objectUrl
     img.addEventListener('load', () => URL.revokeObjectURL(objectUrl), { once: true })
-    // Fallback for RAW/unsupported previews
     const ext = (file.name.split('.').pop() || '').toUpperCase()
     const fallback = document.createElement('div')
     fallback.className = 'file-thumb file-thumb-fallback'
@@ -287,7 +302,6 @@
     sizeEl.className = 'file-size'
     sizeEl.textContent = `${formatFileSize(file.size)}`
 
-    // Status display container
     const statusEl = document.createElement('div')
     statusEl.className = 'file-status'
 
@@ -307,7 +321,6 @@
     const actions = document.createElement('div')
     actions.className = 'actions'
 
-    // Collapsible JSON block
     const jsonDetails = document.createElement('details')
     jsonDetails.className = 'json-block'
     const jsonSummary = document.createElement('summary')
@@ -355,7 +368,6 @@
     return { k, v }
   }
 
-  // Re-render keys on language change; keep values intact
   function rerenderAllCardsLabels() {
     const keyMap = new Map([
       ['Camera', 'camera'], ['相機', 'camera'], ['Cámara', 'camera'],
@@ -399,7 +411,6 @@
         default: break
       }
     })
-    // Update action button labels (by data-action) and JSON summary title
     resultsElement.querySelectorAll('.card .actions .btn').forEach(btn => {
       const act = btn.dataset.action || ''
       if (act === 'map') btn.textContent = t('map')
@@ -407,9 +418,7 @@
       else if (act === 'copy-main') btn.textContent = t('copyMain')
     })
     resultsElement.querySelectorAll('.json-block > summary').forEach(s => s.textContent = t('jsonSummary'))
-    // Update close button aria-label
     resultsElement.querySelectorAll('.card .card-close').forEach(btn => btn.setAttribute('aria-label', t('removeCard')))
-    // Update file status badge labels
     resultsElement.querySelectorAll('.file-status [data-status]')
       .forEach(s => {
         const st = s.getAttribute('data-status')
@@ -419,7 +428,6 @@
       })
   }
 
-  // Serialize with aggressive trimming (omit binary/huge fields)
   function toSerializableTrimmed(obj) {
     const OMIT_KEYS = new Set([
       'ApplicationNotes','XMLPacket','MakerNote','UserComment','Thumbnail','image','ImageData','ICC','ICCProfile','ICC_Profile',
@@ -461,7 +469,6 @@
     return undefined
   }
 
-  // Export helpers
   function nowTimestamp() {
     const d = new Date()
     const pad = n => String(n).padStart(2, '0')
@@ -494,7 +501,6 @@
     if (exportPdfButton) exportPdfButton.disabled = noCards
   }
 
-  // Ensure the busy overlay has a chance to render before heavy work starts
   function waitForNextFrame(times = 1) {
     return new Promise(resolve => {
       const tick = (n) => {
@@ -579,7 +585,6 @@
 
       for (let idx = 0; idx < cards.length; idx++) {
         const card = cards[idx]
-        // Read original card info
         const name = card.querySelector('.file-name')?.textContent || ''
         const size = card.querySelector('.file-size')?.textContent || ''
         const statusText = card.querySelector('.file-status .badge')?.textContent || ''
@@ -591,12 +596,10 @@
         const vals = Array.from(card.querySelectorAll('.kv .val')).map(v => v.textContent)
         for (let i=0;i<Math.min(keys.length, vals.length);i++) {
           const k = keys[i]; const v = vals[i]
-          // Filter out unnecessary entries like Status/JSON
           if (!k || !v) continue
           tablePairs.push([k, v])
         }
 
-        // Build page DOM
         const page = mk('div','pdf-page')
         const header = mk('div','pdf-header')
         header.appendChild(mk('div','pdf-title', t('title')))
@@ -606,7 +609,6 @@
 
         const body = mk('div','pdf-body')
         const left = mk('div')
-        // Thumbnail
         if (imgEl) {
           const thumb = mk('img','pdf-thumb')
           try {
@@ -623,7 +625,6 @@
           } catch { thumb.src = imgEl.src }
           left.appendChild(thumb)
         }
-        // Filename/Size/Status
         const fileinfo = mk('div','pdf-fileinfo', `${name}\n${size}`)
         left.appendChild(fileinfo)
         if (statusText) {
@@ -647,7 +648,6 @@
         page.appendChild(footer)
         root.appendChild(page)
 
-        // Render to canvas and add to PDF (sync per page)
         const canvas = await window.html2canvas(page, { backgroundColor: '#ffffff', scale: 2, useCORS: true, allowTaint: true })
         const imgData = canvas.toDataURL('image/jpeg', 0.95)
         const imgW = pageW - margin * 2
@@ -662,13 +662,11 @@
   }
 
   async function parseOneFile(file) {
-    // Build UI card first for immediate feedback
     const itemId = `id-${Math.random().toString(36).slice(2, 8)}-${Date.now()}`
     const ui = createCardSkeleton(file)
     ui.article.dataset.id = itemId
     resultsElement.prepend(ui.article)
 
-    // Bind remove (close) action on top-right cross button
     ui.closeBtn.addEventListener('click', () => {
       ui.article.remove()
       const idx = parsedResults.findIndex(r => r.id === itemId)
@@ -678,7 +676,6 @@
     })
 
     try {
-      // Parse EXIF quickly, rotation, GPS, and file bytes in parallel
       const [exifrResult, rotation, exifrGps, fileAb] = await Promise.all([
         exifrLib.parse(file, true).catch(() => undefined),
         exifrLib.rotation(file).catch(() => undefined),
@@ -690,7 +687,6 @@
         ui.img.style.transform = `rotate(${rotation.deg}deg) scale(${rotation.scaleX}, ${rotation.scaleY})`
       }
 
-      // Use ExifReader as a fallback and also for RAW preview
       let exif = exifrResult
       let fallback = undefined
       let gps = {}
@@ -716,7 +712,6 @@
       }
 
       if (!exif) {
-        // No EXIF at all
         const badge = document.createElement('span')
         badge.className = 'badge'
         badge.setAttribute('data-status', 'no-exif')
@@ -731,12 +726,10 @@
           'الحالة',
           t('statusNoExif')
         )
-        // Update stats for cards without EXIF as well
         updateStats()
         return
       }
 
-      // Edited/Original status badge
       const edited = isLikelyEdited(exif, fallback)
       const badge = document.createElement('span')
       badge.className = `badge ${edited ? 'danger' : 'success'}`
@@ -777,15 +770,83 @@
       const latNum = Number(gps.latitude)
       const lonNum = Number(gps.longitude)
       if (Number.isFinite(latNum) && Number.isFinite(lonNum)) {
-        const mapLink = document.createElement('a')
-        mapLink.className = 'btn btn-map'
-        mapLink.href = `https://www.google.com/maps/search/?api=1&query=${latNum},${lonNum}`
-        mapLink.target = '_blank'
-        mapLink.rel = 'noopener'
-        mapLink.textContent = t('map')
-        mapLink.dataset.action = 'map'
-        mapLink.style.minWidth = 'fit-content'
-        ui.actions.appendChild(mapLink)
+        const mapButtonsContainer = document.createElement('div')
+        mapButtonsContainer.className = 'actions'
+        mapButtonsContainer.style.gap = '8px'
+        mapButtonsContainer.style.marginBottom = '8px'
+        
+        const googleMapBtn = document.createElement('a')
+        googleMapBtn.className = 'btn-icon btn-google'
+        googleMapBtn.href = `https://www.google.com/maps/search/?api=1&query=${latNum},${lonNum}`
+        googleMapBtn.target = '_blank'
+        googleMapBtn.rel = 'noopener'
+        googleMapBtn.title = t('map')
+        googleMapBtn.dataset.action = 'map'
+        googleMapBtn.innerHTML = `
+          <svg viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+          </svg>
+        `
+        
+        const osmBtn = document.createElement('a')
+        osmBtn.className = 'btn-icon btn-osm'
+        osmBtn.href = `https://www.openstreetmap.org/?mlat=${latNum}&mlon=${lonNum}#map=16/${latNum}/${lonNum}`
+        osmBtn.target = '_blank'
+        osmBtn.rel = 'noopener'
+        osmBtn.title = t('openInOSM')
+        osmBtn.dataset.action = 'osm'
+        osmBtn.innerHTML = `
+          <svg viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+          </svg>
+        `
+        
+        mapButtonsContainer.appendChild(googleMapBtn)
+        mapButtonsContainer.appendChild(osmBtn)
+        ui.actions.appendChild(mapButtonsContainer)
+        
+        const mapContainer = document.createElement('div')
+        mapContainer.className = 'map-container'
+        
+        const mapHeader = document.createElement('div')
+        mapHeader.className = 'map-header'
+        
+        const mapTitle = document.createElement('div')
+        mapTitle.className = 'map-title'
+        mapTitle.textContent = t('mapPreview')
+        
+        const mapToggle = document.createElement('button')
+        mapToggle.className = 'map-toggle'
+        mapToggle.textContent = t('showMap')
+        mapToggle.dataset.action = 'toggle-map'
+        
+        mapHeader.appendChild(mapTitle)
+        mapHeader.appendChild(mapToggle)
+        
+        const mapContent = document.createElement('div')
+        mapContent.className = 'map-content'
+        mapContent.id = `map-${itemId}`
+        
+        mapContainer.appendChild(mapHeader)
+        mapContainer.appendChild(mapContent)
+        
+        ui.actions.parentNode.insertBefore(mapContainer, ui.actions.nextSibling)
+        
+        mapToggle.addEventListener('click', () => {
+          const isVisible = mapContent.classList.contains('show')
+          if (isVisible) {
+            mapContent.classList.remove('show')
+            mapToggle.textContent = t('showMap')
+          } else {
+            mapContent.classList.add('show')
+            mapToggle.textContent = t('hideMap')
+            if (!mapContent.dataset.mapInitialized) {
+              initializeMap(mapContent.id, latNum, lonNum)
+              mapContent.dataset.mapInitialized = 'true'
+            }
+          }
+        })
+        
         addKV(ui.kv, t('gps'), `${latNum.toFixed(6)}, ${lonNum.toFixed(6)}`)
         ui.article.dataset.hasGps = 'true'
         ui.article.dataset.lat = String(latNum)
@@ -816,7 +877,6 @@
       const payload = { exifr: toSerializableTrimmed(exifrResult), exifreader: toSerializableTrimmed(fallback) }
       ui.jsonPre.textContent = JSON.stringify(payload, null, 2)
 
-      // Summary for CSV/JSON export
       const summary = {
         fileName: file.name,
         fileSize: file.size,
@@ -846,7 +906,6 @@
 
       parsedResults.push({ id: itemId, fileName: file.name, fileSize: file.size, summary, edited, exifr: payload.exifr, exifreader: payload.exifreader })
 
-      // Hashes for file verification
       if (fileAb) {
         try {
           const { md5, sha256 } = await computeHashesFromArrayBuffer(fileAb)
@@ -855,7 +914,6 @@
         } catch {}
       }
 
-      // RAW-only extras
       const ext = (file.name.split('.').pop() || '').toLowerCase()
       const isRaw = ['nef','cr2','cr3','arw','raf','rw2','orf','dng','srw','pef'].includes(ext)
       if (isRaw) {
@@ -868,11 +926,9 @@
         if (wb != null) addKV(ui.kv, t('whiteBalance'), String(wb))
       }
 
-      // Digital signature or digests presence
       const rawDigest = fallback?.exif?.OriginalRawFileDigest || exif?.OriginalRawFileDigest || fallback?.exif?.RawImageDigest || exif?.RawImageDigest
       addKV(ui.kv, t('digitalSignature'), rawDigest ? t('signaturePresent') : t('signatureAbsent'))
 
-      // MakerNote snippet (first 64 bytes) and a few readable entries
       try {
         const mn = fallback?.exif?.MakerNote
         const val = mn?.value
@@ -951,7 +1007,6 @@
 
     clearButtonElement.disabled = false
     setDropzoneBusy(true)
-    // let overlay paint before heavy work starts
     try { await waitForNextFrame(2) } catch {}
 
     let completed = 0
@@ -974,7 +1029,6 @@
         const i = index; index++
         if (i >= fileArray.length) break
         const f = fileArray[i]
-        // eslint-disable-next-line no-await-in-loop
         await parseOneFile(f)
         completed++
         updateProgressLabel()
@@ -1044,7 +1098,6 @@
     }
   }
 
-  // Wire URL analyze button
   if (analyzeUrlButton) {
     analyzeUrlButton.addEventListener('click', () => handleUrlAnalyze(urlInputElement?.value || ''))
   }
@@ -1054,18 +1107,15 @@
     })
   }
 
-  // Global paste: support traditional paste and Clipboard API when not typing
   if (pasteButton) pasteButton.addEventListener('click', () => handleClipboardPaste())
   window.addEventListener('paste', async e => {
     try {
-      // If clipboard has files via traditional paste event
       const dt = e.clipboardData
       if (dt && dt.files && dt.files.length > 0) {
         e.preventDefault()
         await handleFiles(dt.files)
         return
       }
-      // Otherwise try async clipboard API for images
       const active = document.activeElement
       const isTyping = active && (active.tagName === 'INPUT' || active.tagName === 'TEXTAREA' || active.isContentEditable)
       if (!isTyping) {
@@ -1075,7 +1125,6 @@
     } catch {}
   })
 
-  // Drag & drop events
   ;['dragenter','dragover'].forEach(evt => {
     dropzoneElement.addEventListener(evt, e => { e.preventDefault(); e.stopPropagation(); dropzoneElement.classList.add('is-dragover') })
   })
@@ -1097,20 +1146,16 @@
     browseLabelElement.addEventListener('click', e => { e.stopPropagation() })
   }
 
-  // File input
   fileInputElement.addEventListener('change', e => {
     const input = e.target
     if (input && input.files) handleFiles(input.files)
-    // keep selection so user can add more without clearing
   })
 
-  // Export buttons
   if (exportJsonButton) exportJsonButton.addEventListener('click', exportAsJSON)
   if (exportCsvButton) exportCsvButton.addEventListener('click', exportAsCSV)
   if (exportPdfButton) exportPdfButton.addEventListener('click', exportAsPDF)
   updateExportButtonsDisabledState()
 
-  // Expand/Collapse all JSON blocks
   const expandAllButton = document.getElementById('expand-all')
   if (expandAllButton) expandAllButton.addEventListener('click', () => {
     document.querySelectorAll('details.json-block').forEach(d => { try { d.setAttribute('open', '') } catch {} })
@@ -1120,7 +1165,6 @@
     document.querySelectorAll('details.json-block').forEach(d => { try { d.removeAttribute('open') } catch {} })
   })
 
-  // Clear results
   clearButtonElement.addEventListener('click', () => {
     resultsElement.innerHTML = ''
     clearButtonElement.disabled = true
@@ -1143,5 +1187,30 @@
         })
       } catch {}
     })
+  }
+
+  function initializeMap(mapId, latitude, longitude) {
+    try {
+      if (typeof L === 'undefined') {
+        console.warn('Leaflet not loaded')
+        return
+      }
+      
+      const mapElement = document.getElementById(mapId)
+      if (!mapElement) return
+      
+      const map = L.map(mapId).setView([latitude, longitude], 16)
+      
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+      }).addTo(map)
+      
+      const marker = L.marker([latitude, longitude]).addTo(map)
+      marker.bindPopup(`<b>Photo Location</b><br>Lat: ${latitude.toFixed(6)}<br>Lon: ${longitude.toFixed(6)}`)
+      
+      mapElement.dataset.mapInstance = map
+    } catch (error) {
+      console.error('Failed to initialize map:', error)
+    }
   }
 })() 

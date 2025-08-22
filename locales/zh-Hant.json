@@ -18,6 +18,7 @@
   "gps": "GPS",
   "error": "錯誤",
   "map": "在 Google Maps 開啟",
+  "openInOSM": "在 OpenStreetMap 開啟",
   "copy": "複製 JSON",
   "copied": "已複製!",
   "copyFail": "複製失敗",
@@ -49,5 +50,8 @@
   "expandAll": "全部展開",
   "collapseAll": "全部收起",
   "removeCard": "移除此卡",
-  "copyMain": "複製主要欄位"
+  "copyMain": "複製主要欄位",
+  "mapPreview": "地圖預覽",
+  "showMap": "顯示地圖",
+  "hideMap": "隱藏地圖"
 } 
