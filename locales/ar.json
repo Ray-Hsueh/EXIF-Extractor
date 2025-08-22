@@ -11,6 +11,8 @@
   "camera": "الكاميرا",
   "lens": "العدسة",
   "time": "الوقت",
+  "createdTime": "وقت الإنشاء",
+  "modifiedTime": "وقت التعديل",
   "iso": "ISO",
   "aperture": "فتحة العدسة",
   "shutter": "سرعة الغالق",

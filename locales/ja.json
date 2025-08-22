@@ -11,6 +11,8 @@
   "camera": "カメラ",
   "lens": "レンズ",
   "time": "時刻",
+  "createdTime": "作成時刻",
+  "modifiedTime": "修正時刻",
   "iso": "ISO",
   "aperture": "絞り",
   "shutter": "シャッター",

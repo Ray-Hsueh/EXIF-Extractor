@@ -11,6 +11,8 @@
   "camera": "کیمرہ",
   "lens": "لینس",
   "time": "وقت",
+  "createdTime": "بنانے کا وقت",
+  "modifiedTime": "ترمیم کا وقت",
   "iso": "ISO",
   "aperture": "اپرچر",
   "shutter": "شٹر",

@@ -11,6 +11,8 @@
   "camera": "कैमरा",
   "lens": "लेंस",
   "time": "समय",
+  "createdTime": "बनाने का समय",
+  "modifiedTime": "संशोधन का समय",
   "iso": "ISO",
   "aperture": "एपर्चर",
   "shutter": "शटर",

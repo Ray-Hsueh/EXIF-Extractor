@@ -394,6 +394,8 @@
         case 'camera': el.textContent = t('camera'); break
         case 'lens': el.textContent = t('lens'); break
         case 'time': el.textContent = t('time'); break
+        case 'Created Time': el.textContent = t('createdTime'); break
+        case 'Modified Time': el.textContent = t('modifiedTime'); break
         case 'iso': el.textContent = t('iso'); break
         case 'aperture': el.textContent = t('aperture'); break
         case 'shutter': el.textContent = t('shutter'); break
@@ -756,8 +758,34 @@
 
       addKV(ui.kv, t('camera'), [make, model].filter(Boolean).join(' '))
       addKV(ui.kv, t('lens'), lens || '')
-      const timeRow = addKV(ui.kv, t('time'), formatDate(dt))
-      if (timeSuspect) { timeRow.k.classList.add('is-suspect'); timeRow.v.classList.add('is-suspect'); timeRow.v.title = 'Modify time differs from original by > 2 min' }
+      
+      if (dto && mdt && dto instanceof Date && mdt instanceof Date && timeSuspect) {
+        const timeDiff = Math.abs(mdt.getTime() - dto.getTime())
+        const diffMinutes = Math.floor(timeDiff / (1000 * 60))
+        const diffHours = Math.floor(timeDiff / (1000 * 60 * 60))
+        const diffDays = Math.floor(timeDiff / (1000 * 60 * 60 * 24))
+        
+        let diffText = ''
+        if (diffDays > 0) {
+          diffText = `${diffDays} day${diffDays > 1 ? 's' : ''}`
+        } else if (diffHours > 0) {
+          diffText = `${diffHours} hour${diffHours > 1 ? 's' : ''}`
+        } else {
+          diffText = `${diffMinutes} minute${diffMinutes > 1 ? 's' : ''}`
+        }
+        
+        const createdTimeRow = addKV(ui.kv, t('createdTime'), formatDate(dto))
+        const modifiedTimeRow = addKV(ui.kv, t('modifiedTime'), `${formatDate(mdt)} (${diffText} diff)`)
+        
+        createdTimeRow.k.classList.add('is-suspect')
+        createdTimeRow.v.classList.add('is-suspect')
+        createdTimeRow.v.title = 'Time difference detected - image may have been edited'
+        modifiedTimeRow.k.classList.add('is-suspect')
+        modifiedTimeRow.v.classList.add('is-suspect')
+      } else if (dt) {
+        addKV(ui.kv, t('time'), formatDate(dt))
+      }
+      
       addKV(ui.kv, t('iso'), iso ? String(iso) : '')
       const exposureValue = (typeof exposure === 'number' ? exposure : Number(exposure))
       addKV(ui.kv, t('shutter'), formatExposureTime(exposureValue))

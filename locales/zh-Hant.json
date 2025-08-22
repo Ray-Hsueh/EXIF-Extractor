@@ -11,6 +11,8 @@
   "camera": "相機",
   "lens": "鏡頭",
   "time": "時間",
+  "createdTime": "創立時間",
+  "modifiedTime": "編輯時間",
   "iso": "ISO",
   "aperture": "光圈",
   "shutter": "快門",

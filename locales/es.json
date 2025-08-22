@@ -11,6 +11,8 @@
   "camera": "Cámara",
   "lens": "Objetivo",
   "time": "Hora",
+  "createdTime": "Hora de creación",
+  "modifiedTime": "Hora de modificación",
   "iso": "ISO",
   "aperture": "Apertura",
   "shutter": "Obturación",
